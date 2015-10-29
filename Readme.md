@@ -15,3 +15,10 @@ You need to install ansible on the control machine
     sudo apt-get install ansible
 ```
 
+## Testing ##
+Test if you can connect to the servers
+
+```
+    ansible all -m ping -i hosts -u deploy
+```
+
