@@ -1,9 +1,5 @@
-[digitalocean]
-127.0.0.1
-
-[angani]
+[production]
 127.0.0.1
 
 [whatsapp:children]
-angani
-digitalocean
+production
