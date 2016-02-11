@@ -1,0 +1,5 @@
+ - hosts:
+     - ongair
+
+   roles:
+     - setup

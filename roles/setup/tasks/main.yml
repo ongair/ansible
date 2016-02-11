@@ -1,0 +1,11 @@
+- name: Update the server
+  apt: update_cache=yes
+
+- name: Upgrade the server
+  apt: upgrade=full
+
+# - name: Install packages
+#   sudo: yes
+#   apt: pkg={{ item }} state=installed update_cache=yes
+#   with_items: 
+#     - build-essential
