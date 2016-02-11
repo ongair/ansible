@@ -1,0 +1,16 @@
+
+- name: Checkout latest code from git. (This will change to PIP)
+  git: repo={{ git_repo }}
+       dest={{ project_directory }}
+       version={{ git_repo_version }}
+       force=yes
+
+- name: Upgrade the virtualenv.
+  sudo: yes
+  pip: requirements={{ project_directory }}requirements.txt virtualenv={{ virtualenv_directory }}
+
+- name: copy the env template to env.
+  command: cp {{project_directory}}.env.template {{project_directory}}.env
+
+# - name: Run the Ongair agent
+#   command: ongair-cli -c .env -a <phone-number>

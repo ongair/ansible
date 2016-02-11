@@ -1,11 +1,45 @@
 - name: Update the server
+  sudo: yes
   apt: update_cache=yes
 
 - name: Upgrade the server
+  sudo: yes
   apt: upgrade=full
 
-# - name: Install packages
-#   sudo: yes
-#   apt: pkg={{ item }} state=installed update_cache=yes
-#   with_items: 
-#     - build-essential
+- name: Install packages
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items: 
+    - build-essential
+    - git-core
+    - git
+    - python-pip
+    - libmysqlclient-dev 
+    - python-dev
+    - libjpeg8 
+    - libjpeg62-dev 
+    - libfreetype6 
+    - libfreetype6-dev
+
+- name: Install Virtualenv
+  sudo: yes
+  pip: name=virtualenv
+
+- name: Create Project Directory
+  sudo: yes
+  file: state=directory path={{project_directory}} owner={{deploy_user}} group={{deploy_user}}
+
+- name: Create Virtualenv Directory
+  sudo: yes  
+  file: state=directory path={{virtualenv_directory}} owner={{deploy_user}} group={{deploy_user}}
+
+
+- name: Upload SSH key.
+  copy: src=~/.ssh/id_rsa.pub 
+        dest=/home/{{ deploy_user }}/.ssh/id_rsa.pub mode=0600
+
+- name: Add github to known_hosts
+  copy: src=~/.ssh/known_hosts
+        dest=/home/{{deploy_user}}/.ssh/
+
+

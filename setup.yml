@@ -1,5 +1,5 @@
  - hosts:
-     - ongair
+     - ongair-test
 
    roles:
      - setup
