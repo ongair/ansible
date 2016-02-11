@@ -5,10 +5,16 @@
        version={{ git_repo_version }}
        force=yes
 
+- name: Install Ongair via PIP
+  sudo: yes
+  pip: name=ongair
+
+  #No need for this if intalling via pip
 - name: Upgrade the virtualenv.
   sudo: yes
   pip: requirements={{ project_directory }}requirements.txt virtualenv={{ virtualenv_directory }}
 
+  #No need for this if installing via pip.
 - name: copy the env template to env.
   command: cp {{project_directory}}.env.template {{project_directory}}.env
 

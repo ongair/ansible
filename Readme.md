@@ -21,4 +21,8 @@ Test if you can connect to the servers
 ```
     ansible all -m ping -i hosts -u deploy
 ```
+## Setting up a new whatsapp agent for ongair ##
 
+```
+   ansible-playbook -i production site.yml --limit <new-host>
+```
