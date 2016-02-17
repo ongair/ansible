@@ -19,10 +19,17 @@ You need to install ansible on the control machine
 Test if you can connect to the servers
 
 ```
-    ansible all -m ping -i hosts -u deploy
+    ansible all -m ping -i staging -u deploy
 ```
+
 ## Setting up a new whatsapp agent for ongair ##
 
 ```
    ansible-playbook -i production site.yml --limit <new-host>
+```
+
+## Deploying new code to all whatsapp servers ##
+
+```
+   ansible-playbook -i production deploy.yml
 ```
