@@ -34,12 +34,4 @@
   file: state=directory path={{virtualenv_directory}} owner={{deploy_user}} group={{deploy_user}}
 
 
-- name: Upload SSH key.
-  copy: src=~/.ssh/id_rsa.pub 
-        dest=/home/{{ deploy_user }}/.ssh/id_rsa.pub mode=0600
-
-- name: Add github to known_hosts
-  copy: src=~/.ssh/known_hosts
-        dest=/home/{{deploy_user}}/.ssh/
-
 

@@ -1,22 +1,17 @@
-
-- name: Checkout latest code from git. (This will change to PIP)
-  git: repo={{ git_repo }}
-       dest={{ project_directory }}
-       version={{ git_repo_version }}
-       force=yes
+- name: Install pkutils
+  sudo: yes
+  pip: name=pkutils virtualenv={{ virtualenv_directory }}
 
 - name: Install Ongair via PIP
   sudo: yes
-  pip: name=ongair
+  pip: name=ongair-whatsapp virtualenv={{ virtualenv_directory }}
 
-  #No need for this if intalling via pip
-- name: Upgrade the virtualenv.
+- name: Copy Script to restart services into the server
   sudo: yes
-  pip: requirements={{ project_directory }}requirements.txt virtualenv={{ virtualenv_directory }}
+  copy: src=restart-services.py 
+        dest=/opt/restart-services.py 
+        owner={{ deploy_user }} 
+        group={{ deploy_user }} mode=755
 
-  #No need for this if installing via pip.
-- name: copy the env template to env.
-  command: cp {{project_directory}}.env.template {{project_directory}}.env
-
-# - name: Run the Ongair agent
-#   command: ongair-cli -c .env -a <phone-number>
+- name: Restart existing ongair agents via a shell script
+  command: /opt/restart-services.py
