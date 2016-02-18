@@ -5,7 +5,7 @@ import re
 
 conf = os.path.dirname("/etc/init/")
 
-ongair_service_format = r'^ongair-(.+)\.conf$'
+ongair_service_format = r'^(ongair-.+)\.conf$'
 ongair_confs = list(
     filter((lambda file: re.search(ongair_service_format, file)),
            os.listdir(conf)))
@@ -20,4 +20,5 @@ for item in ongair_confs:
     else:
         print("Not an ongair service")
 
+print(ongair_confs)
 print(services)

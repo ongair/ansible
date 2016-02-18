@@ -1,2 +1,16 @@
-[whatsapp-servers]
+[account-one]
 127.0.0.1
+
+[account-one]
+127.0.0.1
+
+[account-two]
+127.0.0.1
+
+[account-three]
+127.0.0.1
+
+[whatsapp:children]
+account-one
+account-two
+account-three
