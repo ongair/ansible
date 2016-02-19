@@ -1,5 +1,5 @@
 project_directory: /home/deploy/apps/whatsapp/
-virtualenv_directory: /home/deploy/apps/whatsappenv/
+virtualenv_directory: /home/deploy/apps/whatsapp/venv/
 deploy_user: deploy
 git_repo: git@github.com:ongair/whatsapp.git
 git_repo_version: master

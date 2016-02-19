@@ -1,6 +1,6 @@
  - hosts:
      - ongair-test
-     - whatsapp-servers
+     # - whatsapp
 
    roles:
      - whatsapp

@@ -1,10 +1,10 @@
-- name: Update the server
-  sudo: yes
-  apt: update_cache=yes
+# - name: Update the server
+#   sudo: yes
+#   apt: update_cache=yes
 
-- name: Upgrade the server
-  sudo: yes
-  apt: upgrade=full
+# - name: Upgrade the server
+#   sudo: yes
+#   apt: upgrade=full
 
 - name: Install packages
   sudo: yes

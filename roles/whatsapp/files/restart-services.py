@@ -16,7 +16,7 @@ for item in ongair_confs:
     if match:
         service = match.group(1)
         services.append(service)
-        os.system("sudo service restart %s" % (service))
+        os.system("sudo service %s restart" % (service))
     else:
         print("Not an ongair service")
 
