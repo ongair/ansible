@@ -1,6 +1,6 @@
-# - name: Update the server
-#   sudo: yes
-#   apt: update_cache=yes
+- name: Update the server
+  sudo: yes
+  apt: update_cache=yes
 
 # - name: Upgrade the server
 #   sudo: yes

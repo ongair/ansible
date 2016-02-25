@@ -1,6 +1,10 @@
-[server-one]
-#188.166.234.16 ansible_ssh_user=deploy
+[ongair-188.166.234.16]
+188.166.234.16 ansible_ssh_user=deploy
+
+[ongair-188.166.235.169]
+188.166.235.169 ansible_ssh_user=deploy
 
 [whatsapp:children]
-server-one
+#ongair-188.166.234.16
+ongair-188.166.235.169
 
