@@ -1,0 +1,5 @@
+project_directory: /home/ubuntu/apps/whatsapp/
+virtualenv_directory: /home/ubuntu/apps/whatsapp/venv/
+deploy_user: ubuntu
+account_number: 254775305393
+agent_name: ongair-254775305393

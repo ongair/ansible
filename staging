@@ -1,2 +1,5 @@
 [ongair-test]
 128.199.184.92 ansible_ssh_user=deploy
+
+[whatsapp:children]
+ongair-test

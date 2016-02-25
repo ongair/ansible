@@ -1,1 +1,0 @@
-export NEW_VAR="Testing export"

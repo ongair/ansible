@@ -6,54 +6,21 @@
 
 - name: Install Ongair via PIP
   sudo: yes
-  pip: name=ongair-whatsapp==1.0.2 virtualenv={{ virtualenv_directory }} 
-
-# - name: Run Ongair Cli
-#   command: "{{virtualenv_directory}}/bin/ongair-cli -a 254775305393"
-#   environment:
-#     mandrill_api_key: "{{mandrill_api_key}}"
-#     uploadcare_public_key: "{{uploadcare_public_key}}"
-#     env: "{{env}}"
-#     url: "{{url}}"
-#     channel: "{{channel}}"
-#     pub_key: "{{pub_key}}"
-#     sub_key: "{{sub_key}}"
-#     db: "{{db}}"
-#     pwd: "{{pwd}}"
-#     service_dir: "{{service_dir}}"
-#     encrypted: "{{encrypted}}"
-#     verbose: "{{verbose}}"
-
+  pip: name=ongair-whatsapp==1.0.3 virtualenv={{ virtualenv_directory }}    
+        
 - name: Install Ongair upstart configuration file.
   sudo: yes
   template: src=ongair-conf.j2 
-        dest=/etc/init/{{agent_name}}.conf 
+        dest=/etc/init/{{item.agent_name}}.conf 
         mode=755 
-
-- name: Restart Ongair agent
-  sudo: yes
-  command: service {{agent_name}} restart
-  environment:
-    mandrill_api_key: "{{mandrill_api_key}}"
-    uploadcare_public_key: "{{uploadcare_public_key}}"
-    env: "{{env}}"
-    url: "{{url}}"
-    channel: "{{channel}}"
-    pub_key: "{{pub_key}}"
-    sub_key: "{{sub_key}}"
-    db: "{{db}}"
-    pwd: "{{pwd}}"
-    service_dir: "{{service_dir}}"
-    encrypted: "{{encrypted}}"
-    verbose: "{{verbose}}"
-
+  with_items: "{{agents}}"
   
-# - name: Copy Script to restart services into the server
-#   sudo: yes
-#   copy: src=restart-services.py 
-#         dest=/opt/restart-services.py 
-#         owner={{ deploy_user }} 
-#         group={{ deploy_user }} mode=755
+- name: Copy Script to restart services into the server
+  sudo: yes
+  copy: src=restart-services.py 
+        dest=/opt/restart-services.py 
+        owner={{ deploy_user }} 
+        group={{ deploy_user }} mode=755
 
-# - name: Restart existing ongair agents via a shell script
-#   command: /opt/restart-services.py
+- name: Restart existing ongair agents via a shell script
+  command: /opt/restart-services.py

@@ -1,6 +1,4 @@
- - hosts:
-     # - ongair-test
+ - hosts:     
      - whatsapp
-
    roles:
      - setup

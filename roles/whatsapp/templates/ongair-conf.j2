@@ -1,12 +1,26 @@
 description "Running Ongair via Python"
 
 env PYTHON_HOME={{virtualenv_directory}}
+env mandrill_api_key={{mandrill_api_key}}
+env uploadcare_public_key={{uploadcare_public_key}}
+env env={{env}}
+env url={{url}}
+env channel={{channel}}
+env pub_key={{pub_key}}
+env sub_key={{sub_key}}
+env db={{db}}
+env pwd={{pwd}}
+env service_dir={{service_dir}}
+env encrypted={{encrypted}}
+env verbose={{verbose}}
 
 start on runlevel [2345]
 stop on runlevel [!2345]
 normal exit 0 1
 
-exec $PYTHON_HOME/bin/ongair-cli -a {{account_number}}
+#exec /etc/profile.d/ongair-daemon.sh 
+
+exec {{virtualenv_directory}}bin/ongair-cli -a {{item.account_number}} 
 
 
 
