@@ -23,14 +23,14 @@ git clone git@github.com:ongair/ansible.git && cd ansible
 ```
 ### Setup Ansible Vault Encryption Password ###
 
-In order to securely store the secret data this software uses to configure Ongair-whatsapp servers, we use ansible vault to encrypt the data.  
+To securely store the secret data this software uses to configure Ongair-whatsapp servers, we use ansible vault to encrypt the data.  
 The first thing we do here is to setup the encryption password that ansible will be using to encrypt and decrypt these variables.
 
 ```sh 
 echo 'strong password' >> ~/.vault_pass.txt
 ```
 ### Encyrpting ongair Secret Variables ###
-Once the encryptiong password is setup, we can now use it to encyrpt files in this folder. The secret variables are stored in the file `roles/whatsapp/vars/variables.yml`.  
+Once the encryption password is setup, we can now use it to encyrpt files in this folder. The secret variables are stored in the file `roles/whatsapp/vars/variables.yml`.  
 To encrypt this file, we pass the encryption password we created above to ansible-vault as below.
 ```sh
 ansible-vault encrypt roles/whatsapp/vars/variables.yml --vault-password-file ~/.vault_pass.txt
