@@ -83,8 +83,9 @@ agents:
     - { account_number: 83838833, agent_name: ongair-83838833 }
     - { account_number: 6272644, agent_name: ongair-6272644 }
 ```
-With the above setup, the new host is now part of the ongair-whatsapp inventory and we can configure it, deploy the whatsapp code to it and restart services using this ansible software.  
+With the above setup, the new host is now part of the ongair-whatsapp inventory and we can configure it, deploy the whatsapp code to it and restart services using this ansible software.    
 
+New hosts need to be configured to run the whatsapp code. So the initial command on a new host should be to setup the server before attempting to deploy the code.
 To configure the above host to run the whatsapp code, you can type the following 
 ```sh
 ansible-playbook -i production setup.yml --limit ongair-56.4.5.232 --vault-password-file ~/.vault_pass.txt
