@@ -1,0 +1,4 @@
+
+deploy_user: ubuntu
+agents:
+       - { account_number: 072595995, agent_name: ongair-072595995 }
