@@ -1,0 +1,5 @@
+ - hosts:     
+     - ongair-ec2
+   roles:
+     - setup
+     - whatsapp
