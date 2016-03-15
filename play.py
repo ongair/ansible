@@ -71,7 +71,6 @@ def trial():
         runner_callbacks=runner_cb,
         stats=stats,
         vault_password=os.environ['ongairvaultpassword'],
-        private_key_file='~/.ssh/ongair-whatsapp-key.pem'
     )
     try:
         start = time.time()
