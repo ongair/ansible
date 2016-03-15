@@ -2,4 +2,4 @@
      - ongair-ec2
    roles:
      - setup
-     - whatsapp
+     # - whatsapp
