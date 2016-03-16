@@ -41,7 +41,7 @@ def index():
 
 
 
-@app.route('/trial', methods=['POST'])
+@app.route('/trial')
 def trial():
     if not 'number' in request.args:
         message = 'Please send the request with a trial this format: /trial?number=<number>'
