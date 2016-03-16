@@ -63,7 +63,7 @@ def trial():
         'number': number,
         'agent_name': 'ongair-%s' % (number)
     })
-    file_path = os.path.join(os.path.abspath('./group_vars'), 'ongair-ec2')
+    file_path = os.path.join(os.path.abspath('..'), 'group_vars/ongair-ec2')
     print(file_path)
     try:
         with open(file_path, "w+") as f:
@@ -98,6 +98,21 @@ def trial():
     js = json.dumps(data)
     resp = Response(js, status=200, mimetype='application/json')
     return resp
+
+def notifyslack(number):
+    """
+    from slackclient import SlackClient
+
+    token = "xoxp-28192348123947234198234"      # found at https://api.slack.com/web#authentication
+    sc = SlackClient(token)
+    print sc.api_call("api.test")
+    print sc.api_call("channels.info", channel="1234567890")
+    print sc.api_call(
+        "chat.postMessage", channel="#general", text="Hello from Python! :tada:",
+        username='pybot', icon_emoji=':robot_face:'
+    )
+    """
+    return None
 
 
 if __name__ == '__main__':
