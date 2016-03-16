@@ -64,7 +64,8 @@ def trial():
         'agent_name': 'ongair-%s' % (number)
     })
     file_path = os.path.join(os.path.abspath('..'), 'group_vars/ongair-ec2')
-    print(file_path)
+    playbook_path = os.path.join(os.path.abspath('..'), 'add-to-trial.yml')
+    print(playbook_path)
     try:
         with open(file_path, "w+") as f:
             f.write(rendered_inventory)
@@ -72,7 +73,7 @@ def trial():
         print("cant write to file")
 
     pb = PlayBook(
-        playbook='../add-to-trial.yml',
+        playbook=playbook_path,
         remote_user='ubuntu',
         callbacks=playbook_cb,
         runner_callbacks=runner_cb,
