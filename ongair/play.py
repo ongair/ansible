@@ -77,7 +77,8 @@ def trial():
         callbacks=playbook_cb,
         runner_callbacks=runner_cb,
         stats=stats,
-        vault_password=os.environ['ongairvaultpassword'],
+        # vault_password=os.environ['ongairvaultpassword'],
+        vault_password='whts@99Ongair-3#ncrypt!2@16'
     )
     try:
         start = time.time()
