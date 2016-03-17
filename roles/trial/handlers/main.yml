@@ -1,0 +1,4 @@
+- name: Restart Agent
+  sudo: yes
+  service: name={{item.agent_name}} state=restarted
+  with_items: "{{agents}}"
