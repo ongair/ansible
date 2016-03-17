@@ -15,7 +15,7 @@ from flask import request
 from flask import Response
 
 from ansible.playbook import PlayBook
-from ansible.inventory import Inventory
+from ansible.inventory import Inventory, host, group
 from ansible import callbacks
 from ansible import utils
 
@@ -57,6 +57,31 @@ def trial():
     else:
         number = request.args['number']
 
+  
+    ## first of all, set up a host (or more)
+    # ongair_host = host.Host(
+    #     name = '54.229.173.120',
+    #     port = 22
+    #     )
+    # # with its variables to modify the playbook
+    # ongair_host.set_variable( 'deploy_user', 'ubuntu')
+    # ongair_host.set_variable( 'account_number', number)
+    # ongair_host.set_variable( 'agent_name', 'ongair-%s' % (number))
+
+
+    # ## secondly set up the group where the host(s) has to be added
+    # host_group = group.Group(
+    #     name = 'ongair-ec2'
+    #     )
+    # host_group.add_host(ongair_host)
+
+    # ## the last step is set up the invetory itself
+    # ongair_inventory = Inventory()
+    # ongair_inventory.subset('ongair-ec2')
+
+    # print(ongair_inventory)
+
+
     inventory_template = jinja2.Template(inventory)
     rendered_inventory = inventory_template.render({
         'deploy_user': 'ubuntu',
@@ -73,16 +98,19 @@ def trial():
     except IOError, e:
         print("cant write to file")
 
+    vault_password_file_path = os.path.expanduser("~/.vault_pass.txt")
+
+    vault_password_file = open(vault_password_file_path, "rw+")
+
+
     pb = PlayBook(
         playbook=playbook_path,
         remote_user='ubuntu',
         callbacks=playbook_cb,
         runner_callbacks=runner_cb,
         stats=stats,
-        # inventory=Inventory(['inventory_path']),
-        # host_list='inventory_path',
-        # vault_password=os.environ['ongairvaultpassword'],
-        vault_password='whts@99Ongair-3#ncrypt!2@16'
+        vault_password=vault_password_file.read().split()[0]  
+        
     )
     try:
         
