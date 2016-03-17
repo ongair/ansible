@@ -1,4 +1,4 @@
-hosts
+#hosts
 env/
 
 # Elastic Beanstalk Files
