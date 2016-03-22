@@ -19,6 +19,11 @@ from ansible.inventory import Inventory, host, group
 from ansible import callbacks
 from ansible import utils
 
+from slacker import Slacker
+
+slack = Slacker('xoxp-13657551446-18943926514-28542309984-38163b7a5b')
+
+
 app = Flask(__name__)
 
 inventory = """deploy_user: {{deploy_user}}
@@ -34,10 +39,16 @@ stats = callbacks.AggregateStats()
 runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
 
 
+def notifyslack(number):
+    slack.chat.post_message(
+        '#trialnumbers', 'New trial number %s' % (number))
+
+    return None
+
+
 @app.route('/')
 def index():
     return "<h1 style='color:blue'>Welcome!</h1>"
-
 
 
 @app.route('/trial')
@@ -57,8 +68,7 @@ def trial():
     else:
         number = request.args['number']
 
-  
-    ## first of all, set up a host (or more)
+    # first of all, set up a host (or more)
     # ongair_host = host.Host(
     #     name = '54.229.173.120',
     #     port = 22
@@ -67,7 +77,6 @@ def trial():
     # ongair_host.set_variable( 'deploy_user', 'ubuntu')
     # ongair_host.set_variable( 'account_number', number)
     # ongair_host.set_variable( 'agent_name', 'ongair-%s' % (number))
-
 
     # ## secondly set up the group where the host(s) has to be added
     # host_group = group.Group(
@@ -80,7 +89,6 @@ def trial():
     # ongair_inventory.subset('ongair-ec2')
 
     # print(ongair_inventory)
-
 
     inventory_template = jinja2.Template(inventory)
     rendered_inventory = inventory_template.render({
@@ -102,20 +110,19 @@ def trial():
 
     vault_password_file = open(vault_password_file_path, "rw+")
 
-
     pb = PlayBook(
         playbook=playbook_path,
         remote_user='ubuntu',
         callbacks=playbook_cb,
         runner_callbacks=runner_cb,
         stats=stats,
-        vault_password=vault_password_file.read().split()[0]  
-        
+        vault_password=vault_password_file.read().split()[0]
+
     )
     try:
-        
+
         results = pb.run()
-        
+
     except Exception, e:
         print e
 
@@ -132,22 +139,8 @@ def trial():
     }
     js = json.dumps(data)
     resp = Response(js, status=200, mimetype='application/json')
+    notifyslack(number)
     return resp
-
-def notifyslack(number):
-    """
-    from slackclient import SlackClient
-
-    token = "xoxp-28192348123947234198234"      # found at https://api.slack.com/web#authentication
-    sc = SlackClient(token)
-    print sc.api_call("api.test")
-    print sc.api_call("channels.info", channel="1234567890")
-    print sc.api_call(
-        "chat.postMessage", channel="#general", text="Hello from Python! :tada:",
-        username='pybot', icon_emoji=':robot_face:'
-    )
-    """
-    return None
 
 
 if __name__ == '__main__':
