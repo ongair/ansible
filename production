@@ -28,6 +28,9 @@
 [ongair-128.199.233.182]
 128.199.233.182 ansible_ssh_user=deploy
 
+[ongair-128.199.167.37]
+128.199.167.37 ansible_ssh_user=deploy
+
 [whatsapp:children]
 ongair-188.166.234.16
 ongair-188.166.235.169
@@ -39,3 +42,4 @@ ongair-128.199.118.3
 ongair-188.166.236.27
 ongair-188.166.233.52
 ongair-128.199.233.182
+ongair-128.199.167.37
