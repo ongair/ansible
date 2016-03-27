@@ -142,6 +142,15 @@ def trial():
     notifyslack(number)
     return resp
 
+@app.route('/production')
+def production(number):
+    """
+    launch ec2 instance.
+    Add this number to the ec2 instance via the deploy module.
+    return the ec2 instance details and the new account number that has been added.
+    
+    """
+
 
 if __name__ == '__main__':
     app.debug = True

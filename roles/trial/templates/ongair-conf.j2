@@ -18,7 +18,6 @@ start on runlevel [2345]
 stop on runlevel [!2345]
 normal exit 0 1
 
-#exec /etc/profile.d/ongair-daemon.sh 
 
 exec {{virtualenv_directory}}bin/ongair-cli -a {{item.account_number}} 
 
