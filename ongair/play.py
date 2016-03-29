@@ -21,6 +21,7 @@ from ansible import callbacks
 from ansible import utils
 
 from utils.slack import notifyslack
+from aws.ec2 import launch_instance
 
 app = Flask(__name__)
 
@@ -114,9 +115,9 @@ def trial():
 
 
 @app.route('/production')
-def production():
+def production(number):
     """
-    launch ec2 instance.
+    launch an ec2 production instance.
     Add this number to the ec2 instance via the deploy module.
     return the ec2 instance details and the new account number 
     that has been added.
@@ -125,8 +126,14 @@ def production():
     start = time.time()
     number = '0000001111110000001111'
 
+    # First we launch the new productino instance
+    # We pass the number for taggin and naming of the instance
+
+    new_production_host = launch_instance(number)
+
     # first of all, set up a host (or more)
     ongair_host = host.Host(
+        # replace this with new_production_host.public_ip_address
         name='54.229.173.120',
         port=22
     )
@@ -134,8 +141,10 @@ def production():
     ongair_host.set_variable('deploy_user', 'ubuntu')
     ongair_host.set_variable('account_number', number)
     ongair_host.set_variable('agent_name', 'ongair-%s' % (number))
-    ongair_host.set_variable('project_directory', '/home/deploy/apps/whatsapp/')
-    ongair_host.set_variable('virtualenv_directory', '/home/deploy/apps/whatsapp/venv/')
+    ongair_host.set_variable(
+        'project_directory', '/home/deploy/apps/whatsapp/')
+    ongair_host.set_variable(
+        'virtualenv_directory', '/home/deploy/apps/whatsapp/venv/')
 
     print(ongair_host.vars)
 
@@ -149,9 +158,6 @@ def production():
     ongair_inventory = Inventory([])
     ongair_inventory.add_group(host_group)
     # ongair_inventory.get_group('whatsapp').add_host(ongair_host)
-
-    print(ongair_inventory)
-
 
     production_playbook = os.path.join(os.path.abspath('..'), 'production.yml')
     print(production_playbook)
