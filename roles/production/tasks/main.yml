@@ -1,0 +1,17 @@
+- include_vars: variables.yml
+
+- name: Install pkutils
+  sudo: yes
+  pip: name=pkutils virtualenv={{ virtualenv_directory }}
+
+- name: Install Ongair via PIP
+  sudo: yes
+  pip: name=ongair-whatsapp==1.0.3 virtualenv={{ virtualenv_directory }}    
+        
+- name: Install Ongair upstart configuration file.
+  sudo: yes
+  template: src=ongair-conf.j2 
+        dest=/etc/init/{{agent_name}}.conf 
+        mode=755 
+  notify: Restart Agent
+  
