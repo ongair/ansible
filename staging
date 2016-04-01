@@ -4,6 +4,10 @@
 [ec2-test]
 54.229.173.120 ansible_ssh_private_key_file=~/.ssh/ongair-whatsapp-key.pem ansible_ssh_user=ubuntu
 
+[52.18.43.161]
+52.18.43.161 ansible_ssh_private_key_file=~/.ssh/ongair-shared.pem ansible_ssh_user=ubuntu
+
 [whatsapp:children]
 ongair-test
 ec2-test
+52.18.43.161
