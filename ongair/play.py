@@ -30,6 +30,11 @@ agents:
     - { account_number:{{ number }}, agent_name:{{ agent_name }} }
 """
 
+inventory = """deploy_user: {{deploy_user}}
+agents:
+       - { account_number: {{number}}, agent_name: {{agent_name}} }
+"""
+
 
 # Boilerplace callbacks for stdout/stderr and log output
 utils.VERBOSITY = 0
@@ -152,13 +157,14 @@ def production():
     # We pass the number for tagging and naming of the instance
     print("launching instance")
 
-    new_production_host = launch_instance(number)
+    # new_production_host = launch_instance(number)
+    # hostname = new_production_host.get('public_ip_address')
+    # print hostname
 
     # After we have the IP addresss, we set up a host to run the ansible
     # module.
-    ongair_host = host.Host(
-        # replace this with new_production_host.public_ip_address
-        name='54.229.173.120',
+    ongair_host = host.Host(      
+        name='52.48.146.122',
         port=22
     )
     # with its variables to modify the playbook
@@ -171,6 +177,7 @@ def production():
         'virtualenv_directory', '/home/deploy/apps/whatsapp/venv/')
 
     print(ongair_host.vars)
+    print(ongair_host)
 
     # secondly set up the group where the host(s) has to be added
     host_group = group.Group(
@@ -192,7 +199,7 @@ def production():
         inventory=ongair_inventory,
         remote_user='ubuntu',
         remote_port=22,
-        private_key_file='~/.ssh/ongair-whatsapp-key.pem',
+        private_key_file='~/.ssh/ongair-shared.pem',
         callbacks=playbook_cb,
         runner_callbacks=runner_cb,
         stats=stats,
@@ -209,6 +216,10 @@ def production():
     # Ensure on_stats callback is called
     # for callback modules
     playbook_cb.on_stats(pb.stats)
+
+    if stats.failures or stats.dark:
+        raise RuntimeError('Playbook {0} failed'.format(production_playbook))
+
     end = time.time()
     time_taken = end - start
     data = {
