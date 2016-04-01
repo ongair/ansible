@@ -13,13 +13,13 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 SSH_DIR = os.path.abspath("/home/james/.ssh/")
 AVAILABILITY_ZONE = 'eu-west-1b'
 INSTANCE_TYPE = 't1.micro'
-KEY_PAIR_NAME = 'ongair-whatsapp-key'
+KEY_PAIR_NAME = 'ongair-shared'
 KEY_PAIR_ID = 'xxxyyx'
 SUBNET_ID = 'string'
 VPC_ID = 'string'
-SECURITY_GROUP = 'ongair-whatsapp-shared-security-group'
-SECURITY_GROUP_ID = ''
-BASE_IMAGE_ID = 'ami-f95ef58a'
+SECURITY_GROUP = 'ongair-default'
+SECURITY_GROUP_ID = 'sg-a05abac7'
+BASE_IMAGE_ID = 'ami-b0c379c3'
 
 app = Flask(__name__)
 
@@ -27,23 +27,22 @@ client = boto3.client('ec2')
 
 ec2 = boto3.resource('ec2')
 
-def launch_instance(number):
+
+def launch_instance():
     """
     creates a new ongair instance and returns the instance details
     """
-    phonenumber = "001001001001"
+    phonenumber = "test-001"
     name = "Ongair-trial-test"
-
     client = boto3.client('ec2')
-
     instance = client.run_instances(
         ImageId=BASE_IMAGE_ID,
         MinCount=1,
         MaxCount=1,
         KeyName=KEY_PAIR_NAME,  # Should be a get or create key.
-        # SecurityGroupIds=[
-        #     SECURITY_GROUP_ID,
-        # ],        
+        SecurityGroupIds=[
+            SECURITY_GROUP_ID,
+        ],
         InstanceType='t2.micro',
         Placement={
             'AvailabilityZone': AVAILABILITY_ZONE,
@@ -55,12 +54,11 @@ def launch_instance(number):
         Monitoring={
             'Enabled': True
         },
-        
+
         InstanceInitiatedShutdownBehavior='terminate',  # Should be stop,
-        
+
     )
 
-    
     instance_id = instance['Instances'][0]['InstanceId']
 
     # Tag the instance
@@ -81,10 +79,10 @@ def launch_instance(number):
         this_instance = client.describe_instances(InstanceIds=[instance_id])
         print "Instance state: %s" % this_instance['Reservations'][0]['Instances'][0]['State']['Name']
 
-    print this_instance    
+    print this_instance
 
     instance = this_instance['Reservations'][0]['Instances'][0]
-    
+
     details = {
         'tags': instance.get('Tags'),
         'key_name': instance.get('KeyName'),
@@ -101,10 +99,12 @@ def launch_instance(number):
 
     return jsonify(**details)
 
+
 def stop_instance(id):
     ec2.instances.filter(InstanceIds=[id]).stop()
 
-def stop_instance(id):
+
+def restart_instance(id):
     ec2.instances.filter(InstanceIds=[id]).restart()
 
 
@@ -128,7 +128,48 @@ def create_key_pair():
             print("cant write file")
     return file_path
 
+
 def get_ip_addresses():
     ec2 = client.describe_instances()
     addresses = client.describe_addresses()
     return jsonify(**addresses)
+
+
+def list_agents():
+    ec2 = boto3.resource('ec2')
+    running_instances = ec2.instances.filter(Filters=[{
+        'Name': 'instance-state-name',
+        'Values': ['running']}])
+
+    details = defaultdict()
+
+    servers = {
+        'count': 0,
+        'instances': []
+    }
+
+    for instance in running_instances:
+        print instance.id
+        tags = instance.tags
+        instance_name = None
+        if tags:
+            for tag in tags:
+                if 'Name' in tag['Key']:
+                    instance_name = tag['Value']
+
+        details = {
+            'instance_id': instance.id,
+            'instance_name': instance_name,
+            'instance_type': instance.instance_type,
+            'state': instance.state['Name'],
+            'private_ip': instance.private_ip_address,
+            'public_ip': instance.public_ip_address,
+            'launch_time': instance.launch_time,
+            'image_id': instance.image_id,
+            'public_dns_name': instance.public_dns_name,
+            'key_name': instance.key_name
+        }
+
+        servers['instances'].append(details)
+        servers['count'] += 1
+    return jsonify(**servers)

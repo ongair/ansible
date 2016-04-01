@@ -1,5 +1,5 @@
  - hosts:     
-     - ongair-ec2
+     - trial-host
    roles:     
      - trial
      

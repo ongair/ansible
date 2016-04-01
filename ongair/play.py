@@ -21,13 +21,13 @@ from ansible import callbacks
 from ansible import utils
 
 from utils.slack import notifyslack
-from aws.ec2 import launch_instance
+from aws.ec2 import launch_instance, list_agents, get_ip_addresses
 
 app = Flask(__name__)
 
 inventory = """deploy_user:{{ deploy_user }}
 agents:
-       - { account_number: {{number}}, agent_name: {{agent_name}} }
+    - { account_number:{{ number }}, agent_name:{{ agent_name }} }
 """
 
 
@@ -40,7 +40,14 @@ runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
 
 @app.route('/')
 def index():
-    return "<h1 style='color:blue'>Welcome!</h1>"
+    agents = list_agents()
+    return agents
+
+
+@app.route('/ips')
+def ips():
+    public_ips = get_ip_addresses()
+    return public_ips
 
 
 @app.route('/trial')
@@ -66,7 +73,7 @@ def trial():
         'number': number,
         'agent_name': 'ongair-%s' % (number)
     })
-    file_path = os.path.join(os.path.abspath('..'), 'group_vars/ongair-ec2')
+    file_path = os.path.join(os.path.abspath('..'), 'group_vars/trial-host')
     playbook_path = os.path.join(os.path.abspath('..'), 'add-to-trial.yml')
     inventory_path = os.path.join(os.path.abspath('..'), 'trial')
     print(inventory_path)
@@ -115,7 +122,7 @@ def trial():
 
 
 @app.route('/production')
-def production(number):
+def production():
     """
     launch an ec2 production instance.
     Add this number to the ec2 instance via the deploy module.
@@ -123,15 +130,32 @@ def production(number):
     that has been added.
 
     """
+    # Sstart the timer to measure how much time the request takes
     start = time.time()
-    number = '0000001111110000001111'
 
-    # First we launch the new productino instance
-    # We pass the number for taggin and naming of the instance
+    # Get the number from request and if not send a response
+    if not 'number' in request.args:
+        message = 'Please send the request with a trial this format: /production?number=<number>'
+        data = {
+            'status': 400,
+            'message': message
+        }
+        js = json.dumps(data)
+
+        resp = Response(js, status=400, mimetype='application/json')
+
+        return resp
+    else:
+        number = request.args['number']
+
+    # Now we launch the new production instance
+    # We pass the number for tagging and naming of the instance
+    print("launching instance")
 
     new_production_host = launch_instance(number)
 
-    # first of all, set up a host (or more)
+    # After we have the IP addresss, we set up a host to run the ansible
+    # module.
     ongair_host = host.Host(
         # replace this with new_production_host.public_ip_address
         name='54.229.173.120',
@@ -154,16 +178,15 @@ def production(number):
     )
     host_group.add_host(ongair_host)
 
-    # the last step is set up the inventory itself
+    # the next step is to set up the inventory itself
     ongair_inventory = Inventory([])
     ongair_inventory.add_group(host_group)
-    # ongair_inventory.get_group('whatsapp').add_host(ongair_host)
-
     production_playbook = os.path.join(os.path.abspath('..'), 'production.yml')
     print(production_playbook)
     vault_password_file_path = os.path.expanduser("~/.vault_pass.txt")
     vault_password_file = open(vault_password_file_path, "rw+")
 
+    # Now we run our playbook
     pb = PlayBook(
         playbook=production_playbook,
         inventory=ongair_inventory,
@@ -176,7 +199,6 @@ def production(number):
         vault_password=vault_password_file.read().split()[0]
 
     )
-    print(pb.playbook)
     try:
 
         results = pb.run()
@@ -197,7 +219,7 @@ def production(number):
     }
     js = json.dumps(data)
     resp = Response(js, status=200, mimetype='application/json')
-    # notifyslack(number)
+    notifyslack(number)
     return resp
 
 
