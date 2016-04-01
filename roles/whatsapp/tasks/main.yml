@@ -15,12 +15,12 @@
         mode=755 
   with_items: "{{agents}}"
   
-- name: Copy Script to restart services into the server
-  sudo: yes
-  copy: src=restart-services.py 
-        dest=/opt/restart-services.py 
-        owner={{ deploy_user }} 
-        group={{ deploy_user }} mode=755
+# - name: Copy Script to restart services into the server
+#   sudo: yes
+#   copy: src=restart-services.py 
+#         dest=/opt/restart-services.py 
+#         owner={{ deploy_user }} 
+#         group={{ deploy_user }} mode=755
 
-- name: Restart existing ongair agents via a shell script
-  command: /opt/restart-services.py
+# - name: Restart existing ongair agents via a shell script
+#   command: /opt/restart-services.py
