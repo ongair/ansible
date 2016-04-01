@@ -28,12 +28,11 @@ client = boto3.client('ec2')
 ec2 = boto3.resource('ec2')
 
 
-def launch_instance():
+def launch_instance(phonenumber):
     """
     creates a new ongair instance and returns the instance details
     """
-    phonenumber = "test-001"
-    name = "Ongair-trial-test"
+    name = "Ongair-%s" % (phonenumber)
     client = boto3.client('ec2')
     instance = client.run_instances(
         ImageId=BASE_IMAGE_ID,
@@ -79,7 +78,7 @@ def launch_instance():
         this_instance = client.describe_instances(InstanceIds=[instance_id])
         print "Instance state: %s" % this_instance['Reservations'][0]['Instances'][0]['State']['Name']
 
-    print this_instance
+    # print this_instance
 
     instance = this_instance['Reservations'][0]['Instances'][0]
 
@@ -97,7 +96,7 @@ def launch_instance():
         'network_interfaces': instance.get('NetworkInterfaces')
     }
 
-    return jsonify(**details)
+    return details
 
 
 def stop_instance(id):

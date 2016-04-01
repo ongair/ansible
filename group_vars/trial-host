@@ -1,3 +1,3 @@
-deploy_user:ubuntu
+deploy_user: ubuntu
 agents:
-    - { account_number:131313131, agent_name:ongair-131313131 }
+       - { account_number: 131313131, agent_name: ongair-131313131 }
