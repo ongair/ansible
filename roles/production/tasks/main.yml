@@ -1,5 +1,14 @@
 - include_vars: variables.yml
 
+- name: Wait until SSH is available  
+  local_action: 
+    module: wait_for 
+    host: "{{ public_ip_address }}"
+    port: 22 
+    delay: 10 
+    timeout: 320 
+    state: started
+
 - name: Install pkutils
   sudo: yes
   pip: name=pkutils virtualenv={{ virtualenv_directory }}

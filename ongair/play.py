@@ -19,16 +19,14 @@ from ansible.inventory import Inventory, host, group
 from ansible.runner import Runner
 from ansible import callbacks
 from ansible import utils
+import ansible.constants as C
+
 
 from utils.slack import notifyslack
 from aws.ec2 import launch_instance, list_agents, get_ip_addresses
 
 app = Flask(__name__)
-
-inventory = """deploy_user:{{ deploy_user }}
-agents:
-    - { account_number:{{ number }}, agent_name:{{ agent_name }} }
-"""
+C.HOST_KEY_CHECKING = False
 
 inventory = """deploy_user: {{deploy_user}}
 agents:
@@ -72,11 +70,13 @@ def trial():
     else:
         number = request.args['number']
 
+    agent_name = 'ongair-%s' % (number)
+
     inventory_template = jinja2.Template(inventory)
     rendered_inventory = inventory_template.render({
         'deploy_user': 'ubuntu',
         'number': number,
-        'agent_name': 'ongair-%s' % (number)
+        'agent_name': agent_name
     })
     file_path = os.path.join(os.path.abspath('..'), 'group_vars/trial-host')
     playbook_path = os.path.join(os.path.abspath('..'), 'add-to-trial.yml')
@@ -118,7 +118,9 @@ def trial():
         "message": "successfully added %s to trial" % (number),
         "status": 200,
         "data": results,
-        "time_taken": round(time_taken, 2)
+        "number": number,
+        "agent_name": agent_name,
+        "time_taken": "%s seconds" % round(time_taken, 2)
     }
     js = json.dumps(data)
     resp = Response(js, status=200, mimetype='application/json')
@@ -130,7 +132,7 @@ def trial():
 def production():
     """
     launch an ec2 production instance.
-    Add this number to the ec2 instance via the deploy module.
+    Add the account number to the ec2 instance via the deploy module.
     return the ec2 instance details and the new account number 
     that has been added.
 
@@ -157,20 +159,22 @@ def production():
     # We pass the number for tagging and naming of the instance
     print("launching instance")
 
-    # new_production_host = launch_instance(number)
-    # hostname = new_production_host.get('public_ip_address')
-    # print hostname
+    new_production_host = launch_instance(number)
+    hostname = new_production_host.get('public_ip_address')
+    print hostname
 
     # After we have the IP addresss, we set up a host to run the ansible
     # module.
     ongair_host = host.Host(      
-        name='52.48.146.122',
+        # name='52.50.141.145',
+        name=hostname,
         port=22
     )
     # with its variables to modify the playbook
     ongair_host.set_variable('deploy_user', 'ubuntu')
     ongair_host.set_variable('account_number', number)
     ongair_host.set_variable('agent_name', 'ongair-%s' % (number))
+    ongair_host.set_variable('public_ip_address', hostname)
     ongair_host.set_variable(
         'project_directory', '/home/deploy/apps/whatsapp/')
     ongair_host.set_variable(
@@ -194,7 +198,7 @@ def production():
     vault_password_file = open(vault_password_file_path, "rw+")
 
     # Now we run our playbook
-    pb = PlayBook(
+    pb = PlayBook(        
         playbook=production_playbook,
         inventory=ongair_inventory,
         remote_user='ubuntu',
@@ -226,9 +230,12 @@ def production():
         "message": "success",
         "status": 200,
         "data": results,
+        "number": number,
+        "host": hostname,
         "time_taken": round(time_taken, 2)
     }
     js = json.dumps(data)
+    print(js)
     resp = Response(js, status=200, mimetype='application/json')
     notifyslack(number)
     return resp
