@@ -20,6 +20,7 @@ VPC_ID = 'string'
 SECURITY_GROUP = 'ongair-default'
 SECURITY_GROUP_ID = 'sg-a05abac7'
 BASE_IMAGE_ID = 'ami-b0c379c3'
+# BASE_IMAGE_ID = 'ami-53c74720' #This is the ongair image with configuration done.
 
 app = Flask(__name__)
 
@@ -78,7 +79,7 @@ def launch_instance(phonenumber):
         this_instance = client.describe_instances(InstanceIds=[instance_id])
         print "Instance state: %s" % this_instance['Reservations'][0]['Instances'][0]['State']['Name']
 
-    # print this_instance
+    # print this_insta   nce
 
     instance = this_instance['Reservations'][0]['Instances'][0]
 

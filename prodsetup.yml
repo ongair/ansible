@@ -1,4 +1,4 @@
  - hosts: whatsapp
    gather_facts: no
    roles:
-     - production
+     - productionsetup
