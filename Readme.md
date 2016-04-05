@@ -105,3 +105,36 @@ ansible-playbook -i production site.yml --limit ongair-56.4.5.232 --vault-passwo
 ```
 
 
+# The Ongair Ansible API
+The Ongair ansible allows you to programmatically carry out the above tasks but via a http API.
+The API at the moment has four endpoints:
+- `/trial?number=<number>` Allows you to automatically add a new number to the trial server
+- `/production?number=<number>` Allows to automatically spin up a new instance based on the Ongair Whatsapp image and add a new number to it.
+- `/list` - Lists all available Ongair Production Servers
+- `/reload?instanceid=<instanceid>` - Allows you to reload an instance
+- `/terminate?insanceid=<instanceid>` Allows you to terminate a production instance
+
+
+
+#### Adding a number to the trial server
+To add a number to the trial server, just call the trial endpoint with the number as a paramater. For example to add `0123456789` to trial we just make a GET request to the trial endpoint as follows `http://ansibleapi.ongair.im/trial?number=0123456789`
+
+This adds the number to the trial server and returns with a response in this format
+```
+{
+    status: 200,
+    agent_name: "ongair-0123456789",
+    number: "0123456789",
+    message: "successfully added 0123456789 to trial",
+    data: {
+        52.18.43.161: {
+        unreachable: 0,
+        skipped: 0,
+        ok: 4,
+        changed: 2,
+        failures: 0
+        }
+    },
+    time_taken: "18.14 seconds"
+}
+```
