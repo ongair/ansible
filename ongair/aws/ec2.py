@@ -19,8 +19,8 @@ SUBNET_ID = 'string'
 VPC_ID = 'string'
 SECURITY_GROUP = 'ongair-default'
 SECURITY_GROUP_ID = 'sg-a05abac7'
-BASE_IMAGE_ID = 'ami-b0c379c3'
-# BASE_IMAGE_ID = 'ami-53c74720' #This is the ongair image with configuration done.
+# BASE_IMAGE_ID = 'ami-b0c379c3'
+BASE_IMAGE_ID = 'ami-1a8b0b69' #This is the ongair image with configuration done.
 
 app = Flask(__name__)
 
@@ -101,11 +101,16 @@ def launch_instance(phonenumber):
 
 
 def stop_instance(id):
-    ec2.instances.filter(InstanceIds=[id]).stop()
+    # ec2.instances.filter(InstanceIds=[id]).stop()
+    response = client.stop_instances(InstanceIds=[id])
+    print response
+    return response['StoppingInstances'][0]
 
 
 def restart_instance(id):
-    ec2.instances.filter(InstanceIds=[id]).restart()
+    response = client.reboot_instances(InstanceIds=[id])
+    print response
+    return response
 
 
 def create_key_pair():

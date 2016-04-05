@@ -23,7 +23,7 @@ import ansible.constants as C
 
 
 from utils.slack import notifyslack
-from aws.ec2 import launch_instance, list_agents, get_ip_addresses
+from aws.ec2 import launch_instance, list_agents, get_ip_addresses, stop_instance, restart_instance
 
 app = Flask(__name__)
 C.HOST_KEY_CHECKING = False
@@ -41,7 +41,7 @@ stats = callbacks.AggregateStats()
 runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
 
 
-@app.route('/')
+@app.route('/list')
 def index():
     agents = list_agents()
     return agents
@@ -51,6 +51,56 @@ def index():
 def ips():
     public_ips = get_ip_addresses()
     return public_ips
+
+@app.route('/stop')
+def stop():
+    if not 'instanceid' in request.args:
+        message = 'Please send request to stop instance in this format: /stop?instanceid=<instanceid>'
+        data = {
+            'status': 400,
+            'message': message
+        }
+        js = json.dumps(data)
+
+        resp = Response(js, status=400, mimetype='application/json')
+
+        return resp
+    else:
+        instanceid = request.args['instanceid']
+
+    response = stop_instance(instanceid)
+    js = json.dumps(response)
+    resp = Response(js, status=200, mimetype='application/json')
+    return resp
+
+@app.route('/restart')
+def restart():
+    if not 'instanceid' in request.args:
+        message = 'Please send request to stop instance in this format: /restart?instanceid=<instanceid>'
+        data = {
+            'status': 400,
+            'message': message
+        }
+        js = json.dumps(data)
+
+        resp = Response(js, status=400, mimetype='application/json')
+
+        return resp
+    else:
+        instanceid = request.args['instanceid']
+
+    response = restart_instance(instanceid)
+    data = {
+        "message": "Rebooting Instance",
+        "status": 200,
+        "response": response,
+        "instanceid": instanceid        
+    }
+    js = json.dumps(data)
+    resp = Response(js, status=200, mimetype='application/json')
+    return resp
+
+
 
 
 @app.route('/trial')
