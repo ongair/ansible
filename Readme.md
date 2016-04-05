@@ -106,10 +106,10 @@ ansible-playbook -i production site.yml --limit ongair-56.4.5.232 --vault-passwo
 
 
 # The Ongair Ansible API
-The Ongair ansible allows you to programmatically carry out the above tasks but via a http API.
-The API at the moment has four endpoints:
+The Ongair ansible allows you to carry out the above tasks and more but via a http API instead of just the command line.
+The API at the moment has five endpoints:
 - `/trial?number=<number>` Allows you to automatically add a new number to the trial server
-- `/production?number=<number>` Allows to automatically spin up a new instance based on the Ongair Whatsapp image and add a new number to it.
+- `/production?number=<number>` Allows to automatically spin up a new  production instance and add a new number to it.
 - `/list` - Lists all available Ongair Production Servers
 - `/restart?instanceid=<instanceid>` - Allows you to reload an instance
 - `/stop?insanceid=<instanceid>` Allows you to terminate a production instance
@@ -140,8 +140,8 @@ This adds the number to the trial server and returns with a response in this for
 ```
 
 #### Add a number to Production
-To add a number to the production, the API initiates a process of launching a new Ongair server based on the ongair whatsapp image then runs the playbook to install the latest version of whatsapp code and ads the number to the server. To do this you simply send a request to the production endpoint with the number as a paramater. For example to add `0123456789` to production we just make a GET request to the productino endpoint as follows `http://54.229.156.41/production?number=0123456789`
-This request takes sometime at the moment which causes the browser to timeout but optimization is on the way.
+To add a number to the production, the API initiates a process of launching a new Ongair server based on the ongair whatsapp image then runs the playbook to install the latest version of whatsapp code and ads the number to the server. To do this you simply send a request to the production endpoint with the number as a paramater. For example to add `0123456789` to production we just make a GET request as follows `http://54.229.156.41/production?number=0123456789`
+__This request takes longer at the moment which causes the browser to timeout but optimization is on the way__.
 
 If all goes well you should get a response in this format
 ```
