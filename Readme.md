@@ -23,14 +23,14 @@ git clone git@github.com:ongair/ansible.git && cd ansible
 ```
 ### Setup Ansible Vault Encryption Password ###
 
-In order to securely store the secret data this software uses to configure Ongair-whatsapp servers, we use ansible vault to encrypt the data.  
+To securely store the secret data this software uses to configure Ongair-whatsapp servers, we use ansible vault to encrypt the data.  
 The first thing we do here is to setup the encryption password that ansible will be using to encrypt and decrypt these variables.
 
 ```sh 
 echo 'strong password' >> ~/.vault_pass.txt
 ```
 ### Encyrpting ongair Secret Variables ###
-Once the encryptiong password is setup, we can now use it to encyrpt files in this folder. The secret variables are stored in the file `roles/whatsapp/vars/variables.yml`.  
+Once the encryption password is setup, we can now use it to encyrpt files in this folder. The secret variables are stored in the file `roles/whatsapp/vars/variables.yml`.  
 To encrypt this file, we pass the encryption password we created above to ansible-vault as below.
 ```sh
 ansible-vault encrypt roles/whatsapp/vars/variables.yml --vault-password-file ~/.vault_pass.txt
@@ -83,8 +83,9 @@ agents:
     - { account_number: 83838833, agent_name: ongair-83838833 }
     - { account_number: 6272644, agent_name: ongair-6272644 }
 ```
-With the above setup, the new host is now part of the ongair-whatsapp inventory and we can configure it, deploy the whatsapp code to it and restart services using this ansible software.  
+With the above setup, the new host is now part of the ongair-whatsapp inventory and we can configure it, deploy the whatsapp code to it and restart services using this ansible software.    
 
+New hosts need to be configured to run the whatsapp code. So the initial command on a new host should be to setup the server before attempting to deploy the code.
 To configure the above host to run the whatsapp code, you can type the following 
 ```sh
 ansible-playbook -i production setup.yml --limit ongair-56.4.5.232 --vault-password-file ~/.vault_pass.txt
