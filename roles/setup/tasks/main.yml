@@ -39,5 +39,4 @@
 - name: Create Virtualenv Directory
   sudo: yes  
   file: state=directory path={{virtualenv_directory}} owner={{deploy_user}} group={{deploy_user}}
-
-
+  

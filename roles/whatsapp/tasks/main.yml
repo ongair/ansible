@@ -10,8 +10,13 @@
 - name: Stop ongair services
   command: /opt/stop-services.py
 
+- name: Delete yowsup keys
+  sudo: yes
+  file: path=/home/deploy/.yowsup state=absent
+
 - name: Init virtualenv
-  command: virtualenv {{ virtualenv_directory }}
+  sudo: yes
+  command: virtualenv --clear {{ virtualenv_directory }}
 
 - name: Install pkutils
   sudo: yes
@@ -19,7 +24,7 @@
 
 - name: Install Ongair via PIP
   sudo: yes
-  pip: name=ongair-whatsapp==1.0.10 virtualenv={{ virtualenv_directory }}    
+  pip: name=ongair-whatsapp==1.0.12 virtualenv={{ virtualenv_directory }}    
         
 - name: Install Ongair upstart configuration file.
   sudo: yes
