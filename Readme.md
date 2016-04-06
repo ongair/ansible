@@ -103,7 +103,10 @@ ansible-playbook -i production site.yml --limit ongair-56.4.5.232 --vault-passwo
 ```sh
  ansible-playbook -i production deploy.yml --vault-password-file ~/.vault_pass.txt
 ```
-
+#### Updating the Trial Server ####
+```sh
+ansible-playbook -i trial updatetrial.yml --vault-password-file ~/.vault_pass.txt
+```
 
 # The Ongair Ansible API
 The Ongair ansible allows you to carry out the above tasks and more but via a http API instead of just the command line.
