@@ -1,10 +1,14 @@
+- name: Remove system python
+  sudo: yes
+  apt: name=python2.7 state=absent
+  
+- name: Add Python apt repository
+  sudo: yes
+  apt_repository: repo='ppa:fkrull/deadsnakes-python2.7' 
+
 - name: Update the server
   sudo: yes
   apt: update_cache=yes
-
-# - name: Upgrade the server
-#   sudo: yes
-#   apt: upgrade=full
 
 - name: Install packages
   sudo: yes
@@ -13,6 +17,7 @@
     - build-essential
     - git-core
     - git
+    - python2.7
     - python-pip
     - libmysqlclient-dev 
     - python-dev
@@ -34,6 +39,5 @@
 - name: Create Virtualenv Directory
   sudo: yes  
   file: state=directory path={{virtualenv_directory}} owner={{deploy_user}} group={{deploy_user}}
-
 
 

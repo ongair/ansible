@@ -1,5 +1,18 @@
 - include_vars: variables.yml
 
+- name: Copy stop services script
+  sudo: yes
+  copy: src=stop-services.py
+        dest=/opt/stop-services.py
+        owner={{ deploy_user }}
+        group={{ deploy_user }} mode=755
+
+- name: Stop ongair services
+  command: /opt/stop-services.py
+
+- name: Init virtualenv
+  command: virtualenv {{ virtualenv_directory }}
+
 - name: Install pkutils
   sudo: yes
   pip: name=pkutils virtualenv={{ virtualenv_directory }}
