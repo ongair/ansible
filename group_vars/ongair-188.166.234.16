@@ -1,3 +1,4 @@
+deploy_user: deploy
 agents:   
     - { account_number: 22892599351, agent_name: ongair-22892599351 }
     - { account_number: 254706191729, agent_name: ongair-254706191729 }
