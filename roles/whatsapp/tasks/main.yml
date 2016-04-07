@@ -11,7 +11,7 @@
 - name: Install Ongair via PIP
   sudo: yes
   pip: name=ongair-whatsapp virtualenv={{ virtualenv_directory }} state=latest
-        
+
 - name: Install Ongair upstart configuration file.
   sudo: yes
   template: src=ongair-conf.j2 
