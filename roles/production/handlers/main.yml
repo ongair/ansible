@@ -1,0 +1,4 @@
+- name: Restart Agent
+  sudo: yes
+  service: name={{agent_name}} state=restarted
+  

@@ -103,5 +103,130 @@ ansible-playbook -i production site.yml --limit ongair-56.4.5.232 --vault-passwo
 ```sh
  ansible-playbook -i production deploy.yml --vault-password-file ~/.vault_pass.txt
 ```
+#### Updating the Trial Server ####
+```sh
+ansible-playbook -i trial updatetrial.yml --vault-password-file ~/.vault_pass.txt
+```
+
+# The Ongair Ansible API
+The Ongair ansible allows you to carry out the above tasks and more but via a http API instead of just the command line.
+The API at the moment has five endpoints:
+- `/trial?number=<number>` Allows you to automatically add a new number to the trial server
+- `/production?number=<number>` Allows to automatically spin up a new  production instance and add a new number to it.
+- `/list` - Lists all available Ongair Production Servers
+- `/restart?instanceid=<instanceid>` - Allows you to reload an instance
+- `/stop?insanceid=<instanceid>` Allows you to terminate a production instance
 
 
+
+#### Adding a number to the trial server
+To add a number to the trial server, just call the trial endpoint with the number as a paramater. For example to add `0123456789` to trial we just make a GET request to the trial endpoint as follows `http://54.229.156.41/trial?number=0123456789`
+
+This adds the number to the trial server and returns with a response in this format
+```
+{
+    status: 200,
+    agent_name: "ongair-0123456789",
+    number: "0123456789",
+    message: "successfully added 0123456789 to trial",
+    data: {
+        52.18.43.161: {
+        unreachable: 0,
+        skipped: 0,
+        ok: 4,
+        changed: 2,
+        failures: 0
+        }
+    },
+    time_taken: "3.14 seconds"
+}
+```
+
+#### Add a number to Production
+To add a number to the production, the API initiates a process of launching a new Ongair server based on the ongair whatsapp image then runs the playbook to install the latest version of whatsapp code and ads the number to the server. To do this you simply send a request to the production endpoint with the number as a paramater. For example to add `0123456789` to production we just make a GET request as follows `http://54.229.156.41/production?number=0123456789`
+__This request takes longer at the moment which causes the browser to timeout but optimization is on the way__.
+
+If all goes well you should get a response in this format
+```
+{
+    "data": {
+        "54.229.156.41": {
+            "changed": 2, 
+            "failures": 0, 
+            "ok": 6, 
+            "skipped": 0, 
+            "unreachable": 0
+        }, 
+    "host": "54.229.156.41", 
+    "message": "success", 
+    "number": "0123456789", 
+    "status": 200, 
+    "time_taken": 119.52
+}
+```
+#### Listing all running servers
+To list all production servers, send a request to the endpoint http://54.229.156.41/list
+This list all available servers in this format.
+```
+{
+	count: 3,
+	instances: [
+		{
+		image_id: "ami-1a8b0b69",
+		instance_id: "i-9496e61c",
+		instance_name: "Ongair-8383938338",
+		instance_type: "t2.micro",
+		key_name: "ongair-shared",
+		launch_time: "Tue, 05 Apr 2016 14:10:31 GMT",
+		private_ip: "172.31.9.199",
+		public_dns_name: "ec2-52-49-214-14.eu-west-1.compute.amazonaws.com",
+		public_ip: "52.49.214.14",
+		state: "running"
+		},
+		{
+		image_id: "ami-b0c379c3",
+		instance_id: "i-af7b0e27",
+		instance_name: "Ongair-trial-test",
+		instance_type: "t2.micro",
+		key_name: "ongair-shared",
+		launch_time: "Fri, 01 Apr 2016 14:30:50 GMT",
+		private_ip: "172.31.6.17",
+		public_dns_name: "ec2-52-18-43-161.eu-west-1.compute.amazonaws.com",
+		public_ip: "52.18.43.161",
+		state: "running"
+		},
+......
+```
+#### Stop an instance
+To stop an instance, send a request with the instanceid as follows;
+`http://54.229.156.41/stop?instanceid=i-9496e61c`. This initiates the instance shutdown and sends back this response
+```
+{
+    InstanceId: "i-9496e61c",
+        CurrentState: {
+        Code: 64,
+        Name: "stopping"
+        },
+        PreviousState: {
+        Code: 16,
+        Name: "running"
+        }
+}
+```
+
+#### Restart an instance
+To reboot an instance, send a request with the instanceid as follows;
+`http://54.229.156.41/restart?instanceid=i-9496e61c`. This initiates the instance reboot and sends back this response
+```
+{
+    status: 200,
+    instanceid: "i-cc99e944",
+    message: "Rebooting Instance",
+    response: {
+        ResponseMetadata: {
+        HTTPStatusCode: 200,
+        RequestId: "ed3d77dd-ab37-4270-a334-9e449e49bf95"
+        }
+}
+}
+```

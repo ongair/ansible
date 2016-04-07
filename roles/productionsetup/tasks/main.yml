@@ -1,0 +1,48 @@
+- name: Wait until SSH is available  
+  local_action: 
+    module: wait_for 
+    host: "{{ public_ip_address }}"
+    port: 22 
+    delay: 10 
+    timeout: 320 
+    state: started
+
+- name: Update the server
+  sudo: yes
+  apt: update_cache=yes
+
+- name: Upgrade the server
+  sudo: yes
+  apt: upgrade=full
+
+- name: Install packages
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items: 
+    - build-essential
+    - git-core
+    - git
+    - python-pip
+    - libmysqlclient-dev 
+    - python-dev
+    - libjpeg8 
+    - libjpeg62-dev 
+    - libfreetype6 
+    - libfreetype6-dev
+    - libffi-dev 
+    - libssl-dev
+
+- name: Install Virtualenv
+  sudo: yes
+  pip: name=virtualenv
+
+- name: Create Project Directory
+  sudo: yes
+  file: state=directory path={{project_directory}} owner={{deploy_user}} group={{deploy_user}}
+
+- name: Create Virtualenv Directory
+  sudo: yes  
+  file: state=directory path={{virtualenv_directory}} owner={{deploy_user}} group={{deploy_user}}
+
+
+

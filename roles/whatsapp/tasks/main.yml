@@ -1,13 +1,17 @@
 - include_vars: variables.yml
 
+- name: Init virtualenv
+  sudo: yes
+  command: virtualenv --clear {{ virtualenv_directory }} -p {{ python_path }}
+
 - name: Install pkutils
   sudo: yes
   pip: name=pkutils virtualenv={{ virtualenv_directory }}
 
 - name: Install Ongair via PIP
   sudo: yes
-  pip: name=ongair-whatsapp==1.0.8 virtualenv={{ virtualenv_directory }}    
-        
+  pip: name=ongair-whatsapp virtualenv={{ virtualenv_directory }} state=latest
+
 - name: Install Ongair upstart configuration file.
   sudo: yes
   template: src=ongair-conf.j2 
