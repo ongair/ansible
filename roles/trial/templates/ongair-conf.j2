@@ -11,13 +11,17 @@ env sub_key={{sub_key}}
 env db={{db}}
 env pwd={{pwd}}
 env service_dir={{service_dir}}
-env encrypted={{encrypted}}
+env rollbar_key={{rollbar_key}}
 env verbose={{verbose}}
+env ping_interval={{ping_interval}}
+env yowsup_env={{yowsup_env}}
+env uploadcare_public={{uploadcare_public}}
+env uploadcare_secret={{uploadcare_secret}}
+env slack_token={{slack_token}}
 
 start on runlevel [2345]
 stop on runlevel [!2345]
 normal exit 0 1
-
 
 exec {{virtualenv_directory}}bin/ongair-cli -a {{item.account_number}} 
 
