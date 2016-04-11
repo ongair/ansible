@@ -15,6 +15,7 @@
     - git
     - python-pip
     - libmysqlclient-dev 
+    - libsqlite3-dev
     - python-dev
     - libjpeg8 
     - libjpeg62-dev 
