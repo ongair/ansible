@@ -19,6 +19,12 @@
         mode=755 
   with_items: "{{agents}}"
   
+- name: Install monitor log file
+  file: path={{project_directory}}logs/monitoring.log state=touch owner={{deploy_user}}
+
+- name: Install cron task
+  cron: name='Monitor Ongair' minute="*/10" job="sudo {{virtualenv_directory}}bin/ongair-monitor-cli >> {{project_directory}}logs/monitoring.log"
+
 - name: Copy Script to restart services into the server
   sudo: yes
   copy: src=restart-services.py 
