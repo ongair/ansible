@@ -94,7 +94,7 @@ def restart():
         "message": "Rebooting Instance",
         "status": 200,
         "response": response,
-        "instanceid": instanceid        
+        "instanceid": instanceid
     }
     js = json.dumps(data)
     resp = Response(js, status=200, mimetype='application/json')
@@ -167,7 +167,7 @@ def trial():
     data = {
         "message": "successfully added %s to trial" % (number),
         "status": 200,
-        "data": results,
+        # "data": results,
         "number": number,
         "agent_name": agent_name,
         "time_taken": "%s seconds" % round(time_taken, 2)
@@ -183,7 +183,7 @@ def production():
     """
     launch an ec2 production instance.
     Add the account number to the ec2 instance via the deploy module.
-    return the ec2 instance details and the new account number 
+    return the ec2 instance details and the new account number
     that has been added.
 
     """
@@ -215,7 +215,7 @@ def production():
 
     # After we have the IP addresss, we set up a host to run the ansible
     # module.
-    ongair_host = host.Host(      
+    ongair_host = host.Host(
         # name='52.50.141.145',
         name=hostname,
         port=22
@@ -248,7 +248,7 @@ def production():
     vault_password_file = open(vault_password_file_path, "rw+")
 
     # Now we run our playbook
-    pb = PlayBook(        
+    pb = PlayBook(
         playbook=production_playbook,
         inventory=ongair_inventory,
         remote_user='ubuntu',
