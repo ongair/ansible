@@ -167,7 +167,7 @@ def trial():
     data = {
         "message": "successfully added %s to trial" % (number),
         "status": 200,
-        "data": results,
+        # "data": results,
         "number": number,
         "agent_name": agent_name,
         "time_taken": "%s seconds" % round(time_taken, 2)
