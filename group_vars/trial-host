@@ -1,4 +1,2 @@
 python_path: /usr/bin/python
 deploy_user: ubuntu
-agents:
-       - { account_number: 07235843247, agent_name: ongair-07235843247 }
