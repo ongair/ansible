@@ -128,7 +128,7 @@ def trial():
         'number': number,
         'agent_name': agent_name
     })
-    file_path = os.path.join(os.path.abspath('..'), 'group_vars/trial-host')
+    file_path = os.path.join(os.path.abspath('..'), 'group_vars/trial-host-b')
     playbook_path = os.path.join(os.path.abspath('..'), 'add-to-trial.yml')
     inventory_path = os.path.join(os.path.abspath('..'), 'trial')
     print(inventory_path)

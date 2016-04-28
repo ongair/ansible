@@ -1,0 +1,13 @@
+- name: Install Ongair via PIP
+  sudo: yes
+  pip: name=ongair-whatsapp virtualenv={{ virtualenv_directory }} state=latest
+
+- name: Copy Script to restart services into the server
+  sudo: yes
+  copy: src=restart-services.py 
+        dest=/opt/restart-services.py 
+        owner={{ deploy_user }} 
+        group={{ deploy_user }} mode=755
+
+- name: Restart existing ongair agents via a shell script
+  command: /opt/restart-services.py
