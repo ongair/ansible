@@ -28,9 +28,6 @@
 [ongair-128.199.233.182]
 128.199.233.182 ansible_ssh_user=deploy
 
-[ongair-128.199.167.37]
-128.199.167.37 ansible_ssh_user=deploy
-
 [ongair-188.166.229.128]
 188.166.229.128 ansible_ssh_user=deploy
 
@@ -48,6 +45,5 @@ ongair-128.199.118.3
 ongair-188.166.236.27
 ongair-188.166.233.52
 ongair-128.199.233.182
-ongair-128.199.167.37
 ongair-188.166.229.128
 ongair-188.166.219.54
