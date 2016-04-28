@@ -1,5 +1,5 @@
  - hosts:     
-     - trial
+     - trial-host-b
    roles:     
      - trial
      
