@@ -33,6 +33,8 @@ agents:
        - { account_number: {{number}}, agent_name: {{agent_name}} }
 """
 
+TRIAL_HOST = '52.50.116.32' #This is the current trial server and can change
+
 
 # Boilerplace callbacks for stdout/stderr and log output
 utils.VERBOSITY = 0
@@ -122,6 +124,10 @@ def trial():
 
     agent_name = 'ongair-%s' % (number)
 
+    #Below is the old manual way of creating inventory
+
+    """
+
     inventory_template = jinja2.Template(inventory)
     rendered_inventory = inventory_template.render({
         'deploy_user': 'ubuntu',
@@ -142,16 +148,51 @@ def trial():
 
     vault_password_file = open(vault_password_file_path, "rw+")
 
+    """
+
+
+
+    #New alternative way of automatically building the inventory
+
+
+    trial_host = host.Host(name=TRIAL_HOST, port=22)
+    trial_host.set_variable('deploy_user', 'ubuntu')
+    trial_host.set_variable('account_number', number)
+    trial_host.set_variable('agent_name', 'ongair-%s' % (number))
+    trial_host.set_variable('public_ip_address', TRIAL_HOST)
+    trial_host.set_variable(
+        'project_directory', '/home/deploy/apps/whatsapp/')
+    trial_host.set_variable(
+        'virtualenv_directory', '/home/deploy/apps/whatsapp/venv/')
+    # secondly set up the group where the host(s) has to be added
+    host_group = group.Group(
+        name='trial'
+    )
+    host_group.add_host(trial_host)
+
+    # the next step is to set up the inventory itself
+    trial_inventory = Inventory([])
+    trial_inventory.add_group(host_group)
+    vault_password_file_path = os.path.expanduser("~/.vault_pass.txt")
+    vault_password_file = open(vault_password_file_path, "rw+")
+
+    playbook = os.path.join(os.path.abspath('..'), 'add-to-trial.yml')
+
+    # Now we run our playbook
     pb = PlayBook(
-        playbook=playbook_path,
+        playbook=playbook,
+        inventory=trial_inventory,
         remote_user='ubuntu',
+        remote_port=22,
+        private_key_file='~/.ssh/ongair-shared.pem',
+        # private_key_file='~/.ssh/ongair-whatsapp-key.pem',
         callbacks=playbook_cb,
         runner_callbacks=runner_cb,
         stats=stats,
-        remote_port=22,
         vault_password=vault_password_file.read().split()[0]
 
     )
+
     try:
 
         results = pb.run()

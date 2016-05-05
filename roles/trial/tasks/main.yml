@@ -2,11 +2,6 @@
 
 - name: Install Ongair upstart configuration file.
   sudo: yes
-  template: src=ongair-conf.j2 
-        dest=/etc/init/{{item.agent_name}}.conf 
+  template: src=ongair-conf.j2
+        dest=/etc/init/{{agent_name}}.conf
         mode=755 
-  with_items: "{{agents}}"
-  notify:
-    Restart Agent
-  
-  
