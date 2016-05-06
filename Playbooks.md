@@ -18,3 +18,15 @@ Read this after going over the Readme.md file in this repository. This outlines 
   ```
     ansible-playbook -i trial setuptrial.yml
   ``` 
+
+- Update the `TRIAL_HOST` variable in `ongair/play.py` to point to the new trial server
+
+- Push to github and Update the API server
+
+### Updating the API server ###
+
+You need to update the provisioning API server to use the new api. The ansible module for doing this is available [here](https://github.com/ongair/ansible-aws).
+
+```
+    ansible-playbook -i hosts deploy.yml 
+```
