@@ -33,7 +33,7 @@ agents:
        - { account_number: {{number}}, agent_name: {{agent_name}} }
 """
 
-TRIAL_HOST = '52.50.116.32' #This is the current trial server and can change
+TRIAL_HOST = '52.50.138.0' #This is the current trial server and can change
 
 
 # Boilerplace callbacks for stdout/stderr and log output
