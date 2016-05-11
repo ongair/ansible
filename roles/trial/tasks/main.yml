@@ -4,8 +4,5 @@
   sudo: yes
   template: src=ongair-conf.j2
         dest=/etc/init/{{agent_name}}.conf
-        mode=755 
-
-- name: Start the upstart service
-  sudo: yes
-  service: name={{agent_name}} state=started
+        mode=755
+  notify: Restart Agent
