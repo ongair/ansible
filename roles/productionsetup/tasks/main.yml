@@ -7,6 +7,10 @@
     timeout: 320 
     state: started
 
+- name: Add Python apt repository
+  sudo: yes
+  apt_repository: repo='ppa:fkrull/deadsnakes-python2.7' 
+
 - name: Update the server
   sudo: yes
   apt: update_cache=yes
@@ -20,6 +24,7 @@
   apt: pkg={{ item }} state=installed update_cache=yes
   with_items: 
     - build-essential
+    - python2.7
     - git-core
     - git
     - python-pip

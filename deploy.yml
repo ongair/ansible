@@ -1,4 +1,4 @@
  - hosts:     
-     - whatsapp
+     - trial
    roles:
      - whatsapp
