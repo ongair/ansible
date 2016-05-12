@@ -49,5 +49,12 @@
   sudo: yes  
   file: state=directory path={{virtualenv_directory}} owner={{deploy_user}} group={{deploy_user}}
 
+- name: Create log Directory
+  sudo: yes
+  file: state=directory path={{virtualenv_directory}}/logs owner={{deploy_user}} group={{deploy_user}}
+
+- name: Create tmp Directory
+  sudo: yes
+  file: state=directory path={{virtualenv_directory}}/tmp owner={{deploy_user}} group={{deploy_user}}
 
 
