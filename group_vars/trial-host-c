@@ -1,1 +1,2 @@
 deploy_user: ubuntu
+python_path: /usr/bin/python
