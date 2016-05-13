@@ -70,6 +70,14 @@ def launch_instance(phonenumber):
             {
             'Key': 'Number',
             'Value': phonenumber
+        },
+            {
+            'Key': 'instance-purpose',
+            'Value': 'whatsapp-agent'
+        },
+            {
+            'Key': 'env',
+            'Value': 'production'
         }])
     this_instance = client.describe_instances(InstanceIds=[instance_id])
 
