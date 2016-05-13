@@ -19,7 +19,7 @@ SUBNET_ID = 'string'
 VPC_ID = 'string'
 SECURITY_GROUP = 'ongair-default'
 SECURITY_GROUP_ID = 'sg-a05abac7'
-BASE_IMAGE_ID = 'ami-52a73221' #This is the ongair image with configuration done.
+BASE_IMAGE_ID = 'ami-635ecb10' #This is the ongair image with configuration done.
 
 app = Flask(__name__)
 
