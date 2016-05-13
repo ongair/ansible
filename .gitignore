@@ -1,6 +1,10 @@
 #hosts
 env/
 
+*.pyc
+*.class
+*.egg-info
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
