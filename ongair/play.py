@@ -215,7 +215,7 @@ def trial():
     }
     js = json.dumps(data)
     resp = Response(js, status=200, mimetype='application/json')
-    notifyslack(number)
+    # notifyslack(number)
     return resp
 
 
@@ -328,7 +328,7 @@ def production():
     js = json.dumps(data)
     print(js)
     resp = Response(js, status=200, mimetype='application/json')
-    notifyslack(number)
+    # notifyslack(number)
     return resp
 
 
