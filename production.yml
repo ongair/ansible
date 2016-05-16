@@ -1,2 +1,2 @@
-# - include: prodsetup.yml
 - include: prodeploy.yml
+- include: prodsetup.yml

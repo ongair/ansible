@@ -18,7 +18,7 @@
   pip: name=ongair-whatsapp virtualenv={{ virtualenv_directory }} state=latest
 
 - name: Install cron monitoring task
-  cron: name='Monitor ongair' minute=3 job="sudo {{ virtualenv_directory }}/bin/ongair-monitor-cli >> {{ virtualenv_directory }}/logs/monitoring.log"
+  cron: name='Monitor ongair' minute='*/3' job="sudo {{ virtualenv_directory }}/bin/ongair-monitor-cli >> {{ project_directory }}/logs/monitoring.log"
 
 - name: Install Ongair upstart configuration file.
   sudo: yes

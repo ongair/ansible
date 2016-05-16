@@ -1,9 +1,0 @@
-deploy_user: deploy
-agents:   
-    - { account_number: 22892599351, agent_name: ongair-22892599351 }
-    - { account_number: 254706191729, agent_name: ongair-254706191729 }
-    - { account_number: 254719707070, agent_name: ongair-254719707070 }
-    - { account_number: 27797994278, agent_name: ongair-27797994278 }
-    - { account_number: 27790261633, agent_name: ongair-27790261633 }
-    - { account_number: 27818960503, agent_name: ongair-27818960503 }
-    - { account_number: 27714288904, agent_name: ongair-27714288904 }

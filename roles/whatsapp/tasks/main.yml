@@ -12,19 +12,5 @@
   sudo: yes
   pip: name=ongair-whatsapp virtualenv={{ virtualenv_directory }} state=latest
 
-- name: Install Ongair upstart configuration file.
-  sudo: yes
-  template: src=ongair-conf.j2 
-        dest=/etc/init/{{item.agent_name}}.conf 
-        mode=755 
-  with_items: "{{agents}}"
-  
-- name: Copy Script to restart services into the server
-  sudo: yes
-  copy: src=restart-services.py 
-        dest=/opt/restart-services.py 
-        owner={{ deploy_user }} 
-        group={{ deploy_user }} mode=755
-
-- name: Restart existing ongair agents via a shell script
-  command: /opt/restart-services.py
+- name: Install cron monitoring task
+  cron: name='Monitor ongair' minute=3 job="sudo {{ virtualenv_directory }}/bin/ongair-monitor-cli >> {{ virtualenv_directory }}/logs/monitoring.log"
