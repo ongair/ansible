@@ -1,4 +1,4 @@
- - hosts:
-     - trial
+ - hosts: trial
+   gather_facts: no
    roles:
      - trial
