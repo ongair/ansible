@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import time
 from collections import defaultdict
@@ -10,8 +11,9 @@ from flask import jsonify
 
 
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
-SSH_DIR = os.path.abspath("/home/james/.ssh/")
-AVAILABILITY_ZONE = 'eu-west-1b'
+SSH_DIR = os.path.abspath("~/.ssh/")
+# AVAILABILITY_ZONE = 'ap-southeast-1'
+AVAILABILITY_ZONE = 'eu-west-1'
 INSTANCE_TYPE = 't1.micro'
 KEY_PAIR_NAME = 'ongair-shared'
 KEY_PAIR_ID = 'xxxyyx'
@@ -20,6 +22,7 @@ VPC_ID = 'string'
 SECURITY_GROUP = 'ongair-default'
 SECURITY_GROUP_ID = 'sg-a05abac7'
 BASE_IMAGE_ID = 'ami-a2d145d1' #This is the ongair image with configuration done.
+# BASE_IMAGE_ID = 'ami-3832e45b' #This is the ongair image with configuration done.
 
 app = Flask(__name__)
 
@@ -28,83 +31,88 @@ client = boto3.client('ec2')
 ec2 = boto3.resource('ec2')
 
 
-def launch_instance(phonenumber):
+def launch_instance(phonenumber, tag=None):
     """
     creates a new ongair instance and returns the instance details
     """
-    name = "Ongair-%s" % (phonenumber)
-    client = boto3.client('ec2')
-    instance = client.run_instances(
-        ImageId=BASE_IMAGE_ID,
-        MinCount=1,
-        MaxCount=1,
-        KeyName=KEY_PAIR_NAME,  # Should be a get or create key.
-        SecurityGroupIds=[
-            SECURITY_GROUP_ID,
-        ],
-        InstanceType='t2.micro',
-        Placement={
-            'AvailabilityZone': AVAILABILITY_ZONE,
-            # 'GroupName': 'whatsapp-agents', #Get or create group name
-            'Tenancy': 'default',
+    try:
+        name = "Ongair-%s" % (phonenumber) if tag is None else tag
+        client = boto3.client('ec2')
+        instance = client.run_instances(
+            ImageId=BASE_IMAGE_ID,
+            MinCount=1,
+            MaxCount=1,
+            KeyName=KEY_PAIR_NAME,  # Should be a get or create key.
+            SecurityGroupIds=[
+                SECURITY_GROUP_ID,
+            ],
+            InstanceType='t2.micro',
+            Placement={
+                'AvailabilityZone': AVAILABILITY_ZONE,
+                # 'GroupName': 'whatsapp-agents', #Get or create group name
+                'Tenancy': 'default',
 
-        },
+            },
 
-        Monitoring={
-            'Enabled': True
-        },
+            Monitoring={
+                'Enabled': True
+            },
 
-        InstanceInitiatedShutdownBehavior='terminate',  # Should be stop,
+            InstanceInitiatedShutdownBehavior='terminate',  # Should be stop,
 
-    )
+        )
 
-    instance_id = instance['Instances'][0]['InstanceId']
+        instance_id = instance['Instances'][0]['InstanceId']
 
-    # Tag the instance
-    tags = client.create_tags(
-        Resources=[instance_id],
-        Tags=[{
-            'Key': 'Name',
-            'Value': name
-        },
-            {
-            'Key': 'Number',
-            'Value': phonenumber
-        },
-            {
-            'Key': 'instance-purpose',
-            'Value': 'whatsapp-agent'
-        },
-            {
-            'Key': 'env',
-            'Value': 'production'
-        }])
-    this_instance = client.describe_instances(InstanceIds=[instance_id])
-
-    while this_instance['Reservations'][0]['Instances'][0]['State']['Name'] != 'running':
-        time.sleep(5)
+        # Tag the instance
+        tags = client.create_tags(
+            Resources=[instance_id],
+            Tags=[{
+                'Key': 'Name',
+                'Value': name
+            },
+                {
+                'Key': 'Number',
+                'Value': phonenumber
+            },
+                {
+                'Key': 'instance-purpose',
+                'Value': 'whatsapp-agent'
+            },
+                {
+                'Key': 'env',
+                'Value': 'production'
+            }])
         this_instance = client.describe_instances(InstanceIds=[instance_id])
-        print "Instance state: %s" % this_instance['Reservations'][0]['Instances'][0]['State']['Name']
 
-    # print this_insta   nce
+        while this_instance['Reservations'][0]['Instances'][0]['State']['Name'] != 'running':
+            time.sleep(5)
+            this_instance = client.describe_instances(InstanceIds=[instance_id])
+            print "Instance state: %s" % this_instance['Reservations'][0]['Instances'][0]['State']['Name']
 
-    instance = this_instance['Reservations'][0]['Instances'][0]
+        # print this_insta   nce
 
-    details = {
-        'tags': instance.get('Tags'),
-        'key_name': instance.get('KeyName'),
-        'state': instance.get('State'),
-        'launch_time': instance.get('LaunchTime'),
-        'public_ip_address': instance.get('PublicIpAddress'),
-        'private_ip_address': instance.get('PrivateIpAddress'),
-        'public_dns_name': instance.get('PublicDnsName'),
-        'instance_type': instance.get('InstanceType'),
-        'image_id': instance.get('ImageId'),
-        'instance_id': instance.get('InstanceId'),
-        'network_interfaces': instance.get('NetworkInterfaces')
-    }
+        instance = this_instance['Reservations'][0]['Instances'][0]
 
-    return details
+        details = {
+            'tags': instance.get('Tags'),
+            'key_name': instance.get('KeyName'),
+            'state': instance.get('State'),
+            'launch_time': instance.get('LaunchTime'),
+            'public_ip_address': instance.get('PublicIpAddress'),
+            'private_ip_address': instance.get('PrivateIpAddress'),
+            'public_dns_name': instance.get('PublicDnsName'),
+            'instance_type': instance.get('InstanceType'),
+            'image_id': instance.get('ImageId'),
+            'instance_id': instance.get('InstanceId'),
+            'network_interfaces': instance.get('NetworkInterfaces')
+        }
+
+        return details
+    except:
+        # print 'Error'
+        print "Unexpected error:", sys.exc_info()
+        return []
 
 
 def stop_instance(id):

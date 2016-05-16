@@ -13,6 +13,7 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from flask import Response
+from flask import jsonify
 
 from ansible.playbook import PlayBook
 from ansible.inventory import Inventory, host, group
@@ -21,9 +22,8 @@ from ansible import callbacks
 from ansible import utils
 import ansible.constants as C
 
-
-from utils.slack import notifyslack
 from aws.ec2 import launch_instance, list_agents, get_ip_addresses, stop_instance, restart_instance
+from setup.playbooks import prepare, add_to_server
 
 app = Flask(__name__)
 C.HOST_KEY_CHECKING = False
@@ -102,8 +102,29 @@ def restart():
     resp = Response(js, status=200, mimetype='application/json')
     return resp
 
+@app.route('/prepare')
+def prep():
+    ip = request.args['ip']
+    start = time.time()
+
+    result = prepare(ip)
+    print 'Results: %s' %results
+
+    duration = round(time.time() - start, 2)
+    return jsonify(time_taken=duration, success=result, message='success', status=200)
 
 
+@app.route('/provision')
+def provision():
+    start = time.time()
+    number = request.args['number']
+    ip = request.args['ip']
+
+    result = add_to_server(ip, number)
+    duration = round(time.time() - start, 2)
+    print 'Provisioned %s' %number
+
+    return jsonify(time_taken=("%s seconds" % duration), success=result, number=number, message=("successfully added %s to %s" % (number, ip)), status=200)
 
 @app.route('/trial')
 def trial():
@@ -123,37 +144,6 @@ def trial():
         number = request.args['number']
 
     agent_name = 'ongair-%s' % (number)
-
-    #Below is the old manual way of creating inventory
-
-    """
-
-    inventory_template = jinja2.Template(inventory)
-    rendered_inventory = inventory_template.render({
-        'deploy_user': 'ubuntu',
-        'number': number,
-        'agent_name': agent_name
-    })
-    file_path = os.path.join(os.path.abspath('..'), 'group_vars/trial-host-b')
-    playbook_path = os.path.join(os.path.abspath('..'), 'add-to-trial.yml')
-    inventory_path = os.path.join(os.path.abspath('..'), 'trial')
-    print(inventory_path)
-    try:
-        with open(file_path, "w+") as f:
-            f.write(rendered_inventory)
-    except IOError, e:
-        print("cant write to file")
-
-    vault_password_file_path = os.path.expanduser("~/.vault_pass.txt")
-
-    vault_password_file = open(vault_password_file_path, "rw+")
-
-    """
-
-
-
-    #New alternative way of automatically building the inventory
-
 
     trial_host = host.Host(name=TRIAL_HOST, port=22)
     trial_host.set_variable('deploy_user', 'ubuntu')
@@ -228,108 +218,38 @@ def production():
     that has been added.
 
     """
-    # Sstart the timer to measure how much time the request takes
-    start = time.time()
 
-    # Get the number from request and if not send a response
     if not 'number' in request.args:
-        message = 'Please send the request with a trial this format: /production?number=<number>'
-        data = {
-            'status': 400,
-            'message': message
-        }
-        js = json.dumps(data)
-
-        resp = Response(js, status=400, mimetype='application/json')
-
-        return resp
+        return jsonify(success=False, message='Number parameter is required')
     else:
+        # Start the timer to measure how much time the request takes
+        start = time.time()
+
+        # Get the number and name from request
         number = request.args['number']
+        name = request.args['name'] if 'name' in request.args else None
 
-    # Now we launch the new production instance
-    # We pass the number for tagging and naming of the instance
-    print("launching instance")
+        print('About to create instance for %s tagged %s' %(number, name))
 
-    new_production_host = launch_instance(number)
-    hostname = new_production_host.get('public_ip_address')
-    print hostname
+        # # Now we launch the new production instance
+        # # We pass the number for tagging and naming of the instance
+        new_production_host = launch_instance(number, name)
+        hostname = new_production_host.get('public_ip_address')
+        
+        print("New instance with ip %s is now ready for prep" %hostname)
+        ready = prepare(hostname)
+        print "Results: %s" %ready
 
-    # After we have the IP addresss, we set up a host to run the ansible
-    # module.
-    ongair_host = host.Host(
-        # name='52.50.141.145',
-        name=hostname,
-        port=22
-    )
-    # with its variables to modify the playbook
-    ongair_host.set_variable('deploy_user', 'ubuntu')
-    ongair_host.set_variable('account_number', number)
-    ongair_host.set_variable('agent_name', 'ongair-%s' % (number))
-    ongair_host.set_variable('public_ip_address', hostname)
-    ongair_host.set_variable(
-        'project_directory', '/home/deploy/apps/whatsapp/')
-    ongair_host.set_variable(
-        'virtualenv_directory', '/home/deploy/apps/whatsapp/venv/')
+        result = ready
 
-    print(ongair_host.vars)
-    print(ongair_host)
+        if ready:
+            result = add_to_server(hostname, number)
 
-    # secondly set up the group where the host(s) has to be added
-    host_group = group.Group(
-        name='whatsapp'
-    )
-    host_group.add_host(ongair_host)
+        print 'Completed setup. Result is %s' %result
+        
+        time_taken = round(time.time() - start, 2)        
+        return jsonify(time_taken=time_taken, success=result, message='success', status=200, number=number, hostname=hostname)
 
-    # the next step is to set up the inventory itself
-    ongair_inventory = Inventory([])
-    ongair_inventory.add_group(host_group)
-    production_playbook = os.path.join(os.path.abspath('..'), 'production.yml')
-    print(production_playbook)
-    vault_password_file_path = os.path.expanduser("~/.vault_pass.txt")
-    vault_password_file = open(vault_password_file_path, "rw+")
-
-    # Now we run our playbook
-    pb = PlayBook(
-        playbook=production_playbook,
-        inventory=ongair_inventory,
-        remote_user='ubuntu',
-        remote_port=22,
-        private_key_file='~/.ssh/ongair-shared.pem',
-        callbacks=playbook_cb,
-        runner_callbacks=runner_cb,
-        stats=stats,
-        vault_password=vault_password_file.read().split()[0]
-
-    )
-    try:
-
-        results = pb.run()
-
-    except Exception, e:
-        print e
-
-    # Ensure on_stats callback is called
-    # for callback modules
-    playbook_cb.on_stats(pb.stats)
-
-    if stats.failures or stats.dark:
-        raise RuntimeError('Playbook {0} failed'.format(production_playbook))
-
-    end = time.time()
-    time_taken = end - start
-    data = {
-        "message": "success",
-        "status": 200,
-        "data": results,
-        "number": number,
-        "host": hostname,
-        "time_taken": round(time_taken, 2)
-    }
-    js = json.dumps(data)
-    print(js)
-    resp = Response(js, status=200, mimetype='application/json')
-    # notifyslack(number)
-    return resp
 
 
 if __name__ == '__main__':
