@@ -24,7 +24,7 @@ def add_to_server(ip, number):
     Already assumes the server is prepared
   """
   agent_name = 'ongair-%s' %number
-  result = run_playbook(ip, 'trial', 'add-to-trial.yml', number, agent_name)
+  result = run_playbook([ip], 'trial', 'add-to-trial.yml', number, agent_name)
   return parse_results(result, ip)
 
 
@@ -33,12 +33,22 @@ def prepare(ip):
     Prepare a server - 
     runs any configuration that may be missing from the base image
   """
-  result = run_playbook(ip, 'targets', 'prepare.yml')
+  result = run_playbook([ip], 'targets', 'prepare.yml')
   print 'Finished preparing %s' %result
   return parse_results(result, ip)
 
+def update_agents(ips):
+  """
+    Runs the update ansible role on a server
+    and restarts all the agents on that server
+  """
+  result = run_playbook(ips, 'whatsapp', 'update.yml')
+  return result
 
-def run_playbook(ip, group_name, playbook_file, account_number=None, agent_name=None):
+def _build_host(ip, account_number=None, agent_name=None):
+  """
+    Helper method to build a host
+  """
   hst = host.Host(name=ip, port=22)
   hst.set_variable('deploy_user', 'ubuntu')
   hst.set_variable('public_ip_address', ip)
@@ -46,12 +56,29 @@ def run_playbook(ip, group_name, playbook_file, account_number=None, agent_name=
   hst.set_variable('virtualenv_directory', VENV_DIR)
   hst.set_variable('account_number', account_number)
   hst.set_variable('agent_name', agent_name)
+  return hst
 
-  grp = group.Group(name=group_name)
-  grp.add_host(hst)
+def _build_inventory(ips, group_name, account_number=None, agent_name=None):
+  """
+    Helper method to build an inventory
+  """
+  hosts = [ _build_host(ip) for ip in ips ]
+  gp = group.Group(name=group_name)
+
+  for hst in hosts:
+    gp.add_host(hst)
 
   inv = Inventory([])
-  inv.add_group(grp)
+  inv.add_group(gp)
+
+  return inv
+
+def run_playbook(ips, group_name, playbook_file, account_number=None, agent_name=None):
+  """
+    Runs a specific ansible playbook given some inventory
+  """  
+  inv = _build_inventory(ips, group_name, account_number, agent_name)
+  
   vault_password_file_path = os.path.expanduser(PASSWD_FILE)
   vault_password_file = open(vault_password_file_path, 'rw+')
 

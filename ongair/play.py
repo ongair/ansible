@@ -14,6 +14,7 @@ from flask import jsonify
 from flask import request
 from flask import Response
 from flask import jsonify
+from flask_restful import reqparse
 
 from ansible.playbook import PlayBook
 from ansible.inventory import Inventory, host, group
@@ -23,7 +24,7 @@ from ansible import utils
 import ansible.constants as C
 
 from aws.ec2 import launch_instance, list_agents, get_ip_addresses, stop_instance, restart_instance
-from setup.playbooks import prepare, add_to_server
+from setup.playbooks import prepare, add_to_server, update_agents
 
 app = Flask(__name__)
 C.HOST_KEY_CHECKING = False
@@ -46,7 +47,7 @@ runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
 @app.route('/list')
 def index():
     agents = list_agents()
-    return agents
+    return jsonify(agents)
 
 
 @app.route('/ips')
@@ -113,6 +114,27 @@ def prep():
     duration = round(time.time() - start, 2)
     return jsonify(time_taken=duration, success=result, message='success', status=200)
 
+
+@app.route('/update',  methods=['POST'])
+def update_servers():
+    start = time.time()
+    # limit = request.form['limit']
+    parser = reqparse.RequestParser()
+    parser.add_argument('limit')
+    args = parser.parse_args()
+
+    limit = args['limit']
+
+    servers = list_agents()
+    ips = [ server['public_ip'] for server in servers['instances'] ]
+    if limit is not None:
+        ips = [ ip for ip in ips if ip == limit ]        
+
+    if len(ips) > 0:
+        update_agents(ips)
+
+
+    return jsonify(success=True, ips=ips, limit=limit)
 
 @app.route('/provision')
 def provision():

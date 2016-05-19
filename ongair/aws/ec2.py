@@ -195,4 +195,4 @@ def list_agents():
 
         servers['instances'].append(details)
         servers['count'] += 1
-    return jsonify(**servers)
+    return servers
