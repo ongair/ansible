@@ -157,9 +157,12 @@ def get_ip_addresses():
 
 def list_agents():
     ec2 = boto3.resource('ec2')
-    running_instances = ec2.instances.filter(Filters=[{
-        'Name': 'instance-state-name',
-        'Values': ['running']}])
+    active_filter = { 'Name': 'instance-state-name', 'Values': ['running']}
+    purpose_filter = { 'Name': 'tag:instance-purpose', 'Values': ['whatsapp-agent'] }
+
+    filters = [active_filter, purpose_filter]
+
+    running_instances = ec2.instances.filter(Filters=filters)
 
     details = defaultdict()
 
