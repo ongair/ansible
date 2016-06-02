@@ -1,3 +1,2 @@
 deploy_user: ubuntu
-agents:
-       - { account_number: 000000, agent_name: ongair-000000 }
+python_path: /usr/bin/python

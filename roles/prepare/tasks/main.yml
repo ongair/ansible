@@ -1,5 +1,3 @@
-- include_vars: variables.yml
-
 - name: Wait until SSH is available  
   local_action: 
     module: wait_for 
@@ -8,7 +6,7 @@
     delay: 10 
     timeout: 320 
     state: started
-
+    
 - name: Install pkutils
   sudo: yes
   pip: name=pkutils virtualenv={{ virtualenv_directory }}
@@ -17,13 +15,13 @@
   sudo: yes
   pip: name=ongair-whatsapp virtualenv={{ virtualenv_directory }} state=latest
 
-- name: Install cron monitoring task
-  cron: name='Monitor ongair' minute='*/3' job="sudo {{ virtualenv_directory }}/bin/ongair-monitor-cli >> {{ project_directory }}/logs/monitoring.log"
-
-- name: Install Ongair upstart configuration file.
+- name: Create log Directory
   sudo: yes
-  template: src=ongair-conf.j2 
-        dest=/etc/init/{{agent_name}}.conf 
-        mode=755 
-  notify: Restart Agent
-  
+  file: state=directory path={{project_directory}}logs owner={{deploy_user}} group={{deploy_user}}
+
+- name: Create tmp Directory
+  sudo: yes
+  file: state=directory path={{project_directory}}tmp owner={{deploy_user}} group={{deploy_user}}
+
+- name: Install cron monitoring task
+  cron: name='Monitor ongair' minute='*/3' job="sudo {{ virtualenv_directory }}bin/ongair-monitor-cli >> {{ project_directory }}logs/monitoring.log"

@@ -30,3 +30,10 @@ You need to update the provisioning API server to use the new api. The ansible m
 ```
     ansible-playbook -i hosts deploy.yml 
 ```
+
+### Running the API server in development ###
+
+```
+    #activate the virtual environment in the ongair folder
+    gunicorn play:app -t 600 --reload
+```

@@ -1,6 +1,0 @@
-agents:
-    - { account_number: 559192333631, agent_name: ongair-559192333631 }
-    - { account_number: 27712875025, agent_name: ongair-27712875025 }
-    - { account_number: 821067981316, agent_name: ongair-821067981316 }
-    - { account_number: 491752666260, agent_name: ongair-491752666260 }
-    - { account_number: 254791032460, agent_name: ongair-254791032460 }

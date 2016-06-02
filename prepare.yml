@@ -1,0 +1,4 @@
+ - hosts: targets
+   gather_facts: no
+   roles:
+     - prepare
