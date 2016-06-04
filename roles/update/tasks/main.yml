@@ -1,6 +1,25 @@
+- include_vars: variables.yml
+
+- name: Copy Script to stop services into the server
+  sudo: yes
+  copy: src=stop-services.py 
+        dest=/opt/stop-services.py 
+        owner={{ deploy_user }} 
+        group={{ deploy_user }} mode=755
+
+- name: Stop existing ongair agents via a shell script
+  command: /opt/stop-services.py
+
 - name: Install Ongair via PIP
   sudo: yes
   pip: name=ongair-whatsapp virtualenv={{ virtualenv_directory }} state=latest
+
+- name: Install Ongair upstart configuration file.
+  sudo: yes
+  template: src=ongair-conf.j2
+        dest=/etc/init/{{item}}.conf
+        mode=755 force=yes
+  with_items: "{{ ansible_local.agents.account }}"
 
 - name: Copy Script to restart services into the server
   sudo: yes
@@ -11,3 +30,4 @@
 
 - name: Restart existing ongair agents via a shell script
   command: /opt/restart-services.py
+

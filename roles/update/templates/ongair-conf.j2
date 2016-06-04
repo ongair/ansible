@@ -1,0 +1,29 @@
+description "Running Ongair via Python"
+
+env PYTHON_HOME={{virtualenv_directory}}
+env env={{env}}
+env url={{url}}
+env channel={{channel}}
+env db={{db}}
+env pwd={{pwd}}
+env service_dir={{service_dir}}
+env rollbar_key={{rollbar_key}}
+env verbose={{verbose}}
+env ping_interval={{ping_interval}}
+env yowsup_env={{yowsup_env}}
+env slack_token={{slack_token}}
+env aws_key_id={{aws_key_id}}
+env aws_secret_access_key={{aws_secret_access_key}}
+env aws_s3_bucket={{aws_s3_bucket}}
+env aws_s3_endpoint={{aws_s3_endpoint}}
+
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+normal exit 0 1
+
+exec {{virtualenv_directory}}bin/ongair-cli -a {{item}} 
+
+
+
+respawn

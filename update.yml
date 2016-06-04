@@ -1,4 +1,4 @@
- - hosts:     
-     - whatsapp
+ - hosts: whatsapp
+   gather_facts: yes
    roles:
      - update
