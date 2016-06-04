@@ -25,3 +25,21 @@
 
 - name: Install cron monitoring task
   cron: name='Monitor ongair' minute='*/3' job="sudo {{ virtualenv_directory }}bin/ongair-monitor-cli >> {{ project_directory }}logs/monitoring.log"
+
+- name: Install facts directory
+  sudo: yes
+  file: state=directory path="/etc/ansible/facts.d"
+
+- name: Create facts file
+  sudo: yes
+  file: path="/etc/ansible/facts.d/agents.fact" owner={{ deploy_user }} group={{ deploy_user }} state=touch
+
+- name: Copy Agent Scripts
+  sudo: yes
+  copy: src=set-agents.py 
+        dest=/opt/set-agents.py 
+        owner={{ deploy_user }} 
+        group={{ deploy_user }} mode=755
+  
+- name: Writing facts
+  command: /opt/set-agents.py

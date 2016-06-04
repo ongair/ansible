@@ -103,13 +103,13 @@ def restart():
     resp = Response(js, status=200, mimetype='application/json')
     return resp
 
-@app.route('/prepare')
+@app.route('/prepare', methods=['POST', 'GET'])
 def prep():
     ip = request.args['ip']
     start = time.time()
 
     result = prepare(ip)
-    print 'Results: %s' %results
+    print 'Results: %s' %result
 
     duration = round(time.time() - start, 2)
     return jsonify(time_taken=duration, success=result, message='success', status=200)
