@@ -37,6 +37,20 @@ def prepare(ip):
   print 'Finished preparing %s' %result
   return parse_results(result, ip)
 
+def remove_agent(ip, agent):
+  """
+    Remove an agent from a server
+  """  
+  result = run_playbook([ip], 'targets', 'remove.yml', agent)
+  return parse_results(result, ip)
+
+def upgrade_agent(ip, agent):
+  """
+    Upgrade an agent by removing the axolotl database
+  """
+  result = run_playbook([ip], 'targets', 'upgrade.yml', agent)  
+  return parse_results(result, ip)  
+
 def update_agents(ips):
   """
     Runs the update ansible role on a server
@@ -62,7 +76,7 @@ def _build_inventory(ips, group_name, account_number=None, agent_name=None):
   """
     Helper method to build an inventory
   """
-  hosts = [ _build_host(ip) for ip in ips ]
+  hosts = [ _build_host(ip, account_number, agent_name) for ip in ips ]
   gp = group.Group(name=group_name)
 
   for hst in hosts:

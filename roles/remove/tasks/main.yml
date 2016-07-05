@@ -1,0 +1,11 @@
+- name: Stop the service
+  sudo: yes
+  service: name=ongair-{{account_number}} state=stopped
+
+- name: Remove upstart file
+  sudo: yes
+  file: state=absent path=/etc/init/ongair-{{account_number}}.conf
+
+- name: Remove axolotl db
+  sudo: yes
+  file: state=absent path=/root/.yowsup/{{account_number}}/axolotl.db
