@@ -24,7 +24,7 @@ from ansible import utils
 import ansible.constants as C
 
 from aws.ec2 import launch_instance, list_agents, get_ip_addresses, stop_instance, restart_instance
-from setup.playbooks import prepare, add_to_server, update_agents
+from setup.playbooks import prepare, add_to_server, update_agents, remove_agent
 
 app = Flask(__name__)
 C.HOST_KEY_CHECKING = False
@@ -102,6 +102,18 @@ def restart():
     js = json.dumps(data)
     resp = Response(js, status=200, mimetype='application/json')
     return resp
+
+@app.route('/remove', methods=['POST'])
+def remove_number():
+    ip = request.form.get('ip')
+    number = request.form.get('number')
+    start = time.time()
+
+    result = remove_agent(ip, number)
+    print 'Results: %s' %result
+
+    duration = round(time.time() - start, 2)
+    return jsonify(time_taken=duration, success=result, message='success', status=200)
 
 @app.route('/prepare', methods=['POST', 'GET'])
 def prep():
