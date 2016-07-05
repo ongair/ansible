@@ -1,6 +1,8 @@
 #hosts
 env/
 
+ongair/test.py
+
 *.pyc
 *.class
 *.egg-info
